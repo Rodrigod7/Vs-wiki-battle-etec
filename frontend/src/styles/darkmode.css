@@ -1,0 +1,73 @@
+/* frontend/src/styles/darkmode.css */
+
+:root {
+  --transition-speed: 0.3s;
+}
+
+/* --- MODO CLARO (LIGHT) --- */
+body.light-mode {
+  /* Globales */
+  --bg-main: #f4f7f6;
+  --bg-paper: #ffffff;
+  --bg-input: #f8f9fa;
+  --bg-hover: #eef2f5;
+  
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --text-inverse: #ffffff;
+  
+  --border-color: #e1e8ed;
+  
+  --shadow-card: 0 10px 20px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.1);
+  
+  --accent-primary: #3498db;
+  --accent-hover: #2980b9;
+  --accent-glow: rgba(52, 152, 219, 0.3);
+
+  /* ✅ VARIABLES ESPECÍFICAS DEL SIDEBAR (LIGHT) */
+  --sidebar-bg: #ffffff;           /* Fondo blanco limpio */
+  --sidebar-text: #2c3e50;         /* Texto oscuro */
+  --sidebar-btn-bg: #f8f9fa;       /* Botones gris muy suave */
+  --sidebar-btn-hover: #e2e8f0;    /* Hover un poco más oscuro */
+  --sidebar-border: #e1e8ed;
+}
+
+/* --- MODO OSCURO (DARK) --- */
+body.dark-mode {
+  /* Globales */
+  --bg-main: #0f172a;
+  --bg-paper: #1e293b;
+  --bg-input: #334155;
+  --bg-hover: #334155;
+  
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-inverse: #ffffff;
+  
+  --border-color: #334155;
+  
+  --shadow-card: 0 10px 20px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 0 15px rgba(56, 189, 248, 0.2);
+  
+  --accent-primary: #38bdf8;
+  --accent-hover: #0ea5e9;
+  --accent-glow: rgba(56, 189, 248, 0.4);
+
+  /* ✅ VARIABLES ESPECÍFICAS DEL SIDEBAR (DARK) */
+  --sidebar-bg: #1e293b;           /* Azul oscuro profundo */
+  --sidebar-text: #f1f5f9;         /* Texto claro */
+  --sidebar-btn-bg: rgba(255, 255, 255, 0.05); /* Transparencia sutil */
+  --sidebar-btn-hover: rgba(255, 255, 255, 0.1);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Aplicación Global */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+h1, h2, h3, h4, h5, h6 { color: var(--text-primary); }
+a { color: var(--accent-primary); }

@@ -1,5 +1,4 @@
 // Backend/src/config/db.js
-import { DataTypes } from 'sequelize'; // ✅ Importamos DataTypes
 import sequelize from './sequelizeInstance.js';
 
 // Importamos los modelos
@@ -7,106 +6,61 @@ import User from '../models/userModel.js';
 import Character from '../models/characterModel.js';
 import Conversation from '../models/conversationModel.js';
 import Message from '../models/messageModel.js';
+import ConversationParticipant from '../models/conversationParticipantModel.js';
+import Comment from '../models/commentModel.js';
+import Battle from '../models/battleModel.js';
+import BattleVote from '../models/battleVoteModel.js';
 
-// ========================================
-// 1. DEFINIR TABLA INTERMEDIA MANUALMENTE
-// ========================================
-// Esto es vital para evitar el error de "Unique Constraint" en SQLite
-const ConversationParticipants = sequelize.define('ConversationParticipants', {
-  _id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  }
-  // Sequelize agregará automáticamente userId y conversationId sin restricciones raras
-}, {
-  timestamps: true,
-  indexes: [
-    {
-      unique: true,
-      fields: ['conversationId', 'userId'] // Evita duplicados de la misma persona en el mismo chat
-    }
-  ]
-});
+// ========== RELACIONES DE PERSONAJES ==========
+User.hasMany(Character, { foreignKey: 'creatorId', as: 'characters', onDelete: 'CASCADE' });
+Character.belongsTo(User, { foreignKey: 'creatorId', as: 'creator' });
 
-// ========================================
-// 2. DEFINIR ASOCIACIONES
-// ========================================
+// ========== RELACIONES DE COMENTARIOS ==========
+User.hasMany(Comment, { foreignKey: 'userId', as: 'comments' });
+Comment.belongsTo(User, { foreignKey: 'userId', as: 'author' });
 
-// --- Character y Creator (User) ---
-User.hasMany(Character, {
-  foreignKey: 'creatorId',
-  as: 'characters',
-  onDelete: 'CASCADE'
-});
-Character.belongsTo(User, {
-  foreignKey: 'creatorId',
-  as: 'creator'
-});
+Character.hasMany(Comment, { foreignKey: 'characterId', as: 'comments' });
+Comment.belongsTo(Character, { foreignKey: 'characterId', as: 'character' });
 
-// --- Conversaciones y Participantes (User) ---
-// Usamos el modelo ConversationParticipants explícito
-User.belongsToMany(Conversation, {
-  through: ConversationParticipants,
-  foreignKey: 'userId',
-  otherKey: 'conversationId',
-  as: 'conversations'
-});
+Comment.hasMany(Comment, { foreignKey: 'parentId', as: 'replies' });
+Comment.belongsTo(Comment, { foreignKey: 'parentId', as: 'parent' });
 
-Conversation.belongsToMany(User, {
-  through: ConversationParticipants,
-  foreignKey: 'conversationId',
-  otherKey: 'userId',
-  as: 'participants'
-});
+// ========== RELACIONES DE BATALLAS ==========
+User.hasMany(Battle, { foreignKey: 'creatorId', as: 'battles' });
+Battle.belongsTo(User, { foreignKey: 'creatorId', as: 'creator' });
 
-// --- Mensajes (Sender y Conversation) ---
-Message.belongsTo(User, {
-  foreignKey: 'senderId',
-  as: 'sender'
-});
-User.hasMany(Message, {
-  foreignKey: 'senderId',
-  as: 'sentMessages'
-});
+Battle.belongsTo(Character, { foreignKey: 'character1Id', as: 'character1' });
+Battle.belongsTo(Character, { foreignKey: 'character2Id', as: 'character2' });
 
-Message.belongsTo(Conversation, {
-  foreignKey: 'conversationId',
-  onDelete: 'CASCADE'
-});
-Conversation.hasMany(Message, {
-  foreignKey: 'conversationId',
-  as: 'messages'
-});
+// ========== RELACIONES DE VOTOS ==========
+User.hasMany(BattleVote, { foreignKey: 'userId', as: 'battleVotes' });
+BattleVote.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-// --- Conversación y Character (opcional) ---
-Conversation.belongsTo(Character, {
-  foreignKey: 'characterId',
-  as: 'character',
-  onDelete: 'SET NULL',
-  allowNull: true
-});
+Battle.hasMany(BattleVote, { foreignKey: 'battleId', as: 'votes' });
+BattleVote.belongsTo(Battle, { foreignKey: 'battleId', as: 'battle' });
 
-// --- Conversación y Último Mensaje ---
-Conversation.belongsTo(Message, {
-  foreignKey: 'lastMessageId',
-  as: 'lastMessage',
-  onDelete: 'SET NULL',
-  allowNull: true
-});
+// ========== RELACIONES DE CONVERSACIONES ==========
+User.belongsToMany(Conversation, { through: ConversationParticipant, foreignKey: 'userId', as: 'conversations' });
+Conversation.belongsToMany(User, { through: ConversationParticipant, foreignKey: 'conversationId', as: 'participants' });
 
-// ========================================
-// FUNCIÓN DE CONEXIÓN
-// ========================================
+Conversation.hasMany(Message, { foreignKey: 'conversationId', as: 'messages' });
+Message.belongsTo(Conversation, { foreignKey: 'conversationId', as: 'conversation' });
 
-const connectDB = async () => {
+User.hasMany(Message, { foreignKey: 'senderId', as: 'sentMessages' });
+Message.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
+
+Conversation.belongsTo(Message, { foreignKey: 'lastMessageId', as: 'lastMessage' });
+Conversation.belongsTo(Character, { foreignKey: 'characterId', as: 'character' });
+
+// ========== FUNCIÓN DE CONEXIÓN ==========
+export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ SQLite Connection established successfully.');
     
-    // Sincronizar modelos
-    // Usamos alter: true para intentar ajustar, pero si falla, el usuario borrará la DB
-    await sequelize.sync({ force: false, alter: true });
+    // CAMBIO IMPORTANTE: Pon esto en false para detener la sincronización forzada
+    await sequelize.sync({ force: false, alter: false }); 
+    
     console.log('✅ All models synchronized successfully.');
     console.log('🎮 VS Wiki Battle ETEC - Database ready!');
 
@@ -115,6 +69,4 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
-
-// Exportamos sequelize y todos los modelos
-export { connectDB, sequelize, User, Character, Conversation, Message };
+export { sequelize, User, Character, Conversation, Message, ConversationParticipant, Comment, Battle, BattleVote };

@@ -1,113 +1,221 @@
-// frontend/src/components/CharacterGallery.js
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+// frontend/src/components/CharacterGallery-updated.js
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getValidImageUrl } from '../utils/imageHelper'; // ✅ IMPORTAR HELPER
 import './CharacterGallery.css';
 
 const CharacterGallery = () => {
+  const navigate = useNavigate();
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ search: '', tier: '' });
-
-  const tiers = [
-    'Street Level', 'City Level', 'Country Level', 'Continental',
-    'Planet Level', 'Star Level', 'Galaxy Level', 'Universal', 
-    'Multiversal', 'Omnipotent', 'Unknown'
-  ];
-
-  const fetchCharacters = useCallback(async () => {
-    setLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      if (filters.search) queryParams.append('search', filters.search);
-      if (filters.tier) queryParams.append('tier', filters.tier);
-
-      // Usamos ruta relativa /api
-      const res = await fetch(`/api/characters?${queryParams.toString()}`);
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setCharacters(data.data);
-      } else {
-        setCharacters([]);
-      }
-    } catch (error) {
-      console.error('Error fetching characters:', error);
-      // No mostramos toast de error aquí para no spamear en móvil si falla la conexión inicial
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+  const [filters, setFilters] = useState({
+    search: '',
+    tier: '',
+    sortBy: 'recent'
+  });
+  
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCharacters, setTotalCharacters] = useState(0);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     fetchCharacters();
-  }, [fetchCharacters]);
+  }, [filters, currentPage]);
 
-  const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+  const fetchCharacters = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: currentPage,
+        limit: itemsPerPage,
+        ...(filters.search && { search: filters.search }),
+        ...(filters.tier && { tier: filters.tier }),
+        ...(filters.sortBy && { sortBy: filters.sortBy })
+      });
+
+      const response = await fetch(`/api/characters?${queryParams}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setCharacters(data.data);
+        setTotalPages(data.pagination.totalPages);
+        setTotalCharacters(data.pagination.totalCharacters);
+      }
+    } catch (error) {
+      console.error('Error fetching characters:', error);
+      toast.error('Error al cargar personajes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`page-btn ${i === currentPage ? 'active' : ''}`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return (
+      <div className="pagination">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="page-btn page-prev"
+        >
+          ← Anterior
+        </button>
+
+        {startPage > 1 && (
+          <>
+            <button onClick={() => handlePageChange(1)} className="page-btn">
+              1
+            </button>
+            {startPage > 2 && <span className="page-ellipsis">...</span>}
+          </>
+        )}
+
+        {pages}
+
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="page-ellipsis">...</span>}
+            <button onClick={() => handlePageChange(totalPages)} className="page-btn">
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="page-btn page-next"
+        >
+          Siguiente →
+        </button>
+      </div>
+    );
   };
 
   return (
     <div className="gallery-container">
       <div className="gallery-header">
-        <h2>🌌 Galería de Guerreros</h2>
-        <p>Explora los personajes más poderosos de ETEC</p>
+        <h1 className="gallery-title">⚔️ Galería de Personajes ⚔️</h1>
+        <p className="gallery-subtitle">
+          {totalCharacters} {totalCharacters === 1 ? 'personaje' : 'personajes'} en total
+        </p>
       </div>
 
       <div className="gallery-filters">
         <input
           type="text"
-          name="search"
-          placeholder="🔍 Buscar personaje..."
+          placeholder="🔍 Buscar por nombre..."
           value={filters.search}
-          onChange={handleFilterChange}
-          className="search-input"
+          onChange={(e) => handleFilterChange('search', e.target.value)}
+          className="filter-input"
         />
-        <select 
-          name="tier" 
-          value={filters.tier} 
-          onChange={handleFilterChange}
-          className="tier-select"
+
+        <select
+          value={filters.tier}
+          onChange={(e) => handleFilterChange('tier', e.target.value)}
+          className="filter-select"
         >
-          <option value="">Todos los Niveles</option>
-          {tiers.map(tier => (
-            <option key={tier} value={tier}>{tier}</option>
-          ))}
+          <option value="">Todos los Tiers</option>
+          <option value="Street Level">Street Level</option>
+          <option value="Building Level">Building Level</option> {/* Agregado */}
+          <option value="City Level">City Level</option>
+          <option value="Country Level">Country Level</option>
+          <option value="Continental">Continental</option> {/* Agregado */}
+          <option value="Planet Level">Planet Level</option>
+          <option value="Star Level">Star Level</option> {/* Agregado */}
+          <option value="Galaxy Level">Galaxy Level</option> {/* Agregado */}
+          <option value="Universal">Universal</option>
+          <option value="Multiversal">Multiversal</option>
+          <option value="Hyperversal">Hyperversal</option> {/* Agregado */}
+          <option value="Omnipotent">Omnipotent</option>
+        </select>
+
+        <select
+          value={filters.sortBy}
+          onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+          className="filter-select"
+        >
+          <option value="recent">Más Recientes</option>
+          <option value="popular">Más Populares</option>
+          <option value="name">Por Nombre</option>
         </select>
       </div>
 
       {loading ? (
-        <div className="gallery-loading">Cargando guerreros...</div>
+        <div className="loading-gallery">Cargando personajes...</div>
+      ) : characters.length === 0 ? (
+        <div className="no-results">
+          <h2>No se encontraron personajes</h2>
+          <p>Intenta ajustar los filtros de búsqueda</p>
+        </div>
       ) : (
-        <div className="gallery-grid">
-          {characters.length > 0 ? (
-            characters.map(char => (
-              <Link to={`/characters/${char._id}`} key={char._id} className="character-card">
-                <div className="card-image-wrapper">
-                  {/* ✅ USAR HELPER AQUÍ */}
-                  <img 
-                    src={getValidImageUrl(char.image)} 
-                    alt={char.name} 
-                    className="card-image"
-                    onError={(e) => e.target.src = 'https://placehold.co/300x400?text=Error'}
-                  />
-                  <div className="card-tier-badge">{char.tier}</div>
+        <>
+          <div className="characters-grid">
+            {characters.map((character) => (
+              <div
+                key={character._id}
+                className="character-card"
+                onClick={() => navigate(`/character/${character._id}`)}
+              >
+                <div className="char-image-wrapper">
+                  <img src={character.image} alt={character.name} />
+                  <div className="char-tier-overlay">{character.tier}</div>
                 </div>
-                <div className="card-content">
-                  <h3>{char.name}</h3>
-                  <p className="card-universe">🌐 {char.universe}</p>
-                  <div className="card-stats">
-                    <span>⚔️ Poder: {char.powerLevel}</span>
-                    <span>❤️ {char.likes}</span>
+                <div className="char-info-section">
+                  <h3 className="char-name">{character.name}</h3>
+                  {character.alias && <p className="char-alias">{character.alias}</p>}
+                  <div className="char-stats-row">
+                    <span className="stat-item">⚡ {character.powerLevel}</span>
+                    <span className="stat-item">👁️ {character.views}</span>
+                    <span className="stat-item">❤️ {character.likes}</span>
+                  </div>
+                  <div className="char-creator">
+                    Por: {character.creator?.username || 'Anónimo'}
                   </div>
                 </div>
-              </Link>
-            ))
-          ) : (
-            <p className="no-results">No se encontraron personajes.</p>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+
+          {renderPagination()}
+        </>
       )}
     </div>
   );

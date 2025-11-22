@@ -4,74 +4,66 @@ import sequelize from '../config/sequelizeInstance.js';
 
 const Character = sequelize.define('Character', {
   _id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  
-  // --- INFO BÁSICA ---
   name: { type: DataTypes.STRING(100), allowNull: false },
-  alias: { type: DataTypes.STRING(100), allowNull: true }, // "El Señor del Lag"
+  alias: { type: DataTypes.STRING(100), allowNull: true },
+  quote: { type: DataTypes.TEXT, allowNull: true },
+  description: { type: DataTypes.TEXT, allowNull: false },
+  origin: { type: DataTypes.STRING(100), allowNull: true },
+  gender: { type: DataTypes.STRING(50), allowNull: true },
+  classification: { type: DataTypes.STRING(100), allowNull: true },
   
-  // --- LORE PROFUNDO ---
-  quote: { type: DataTypes.TEXT, allowNull: true }, // "Cierren los ojos..."
-  description: { type: DataTypes.TEXT, allowNull: false }, // Historia completa
-  origin: { type: DataTypes.STRING(100), allowNull: true }, // "Servidor Central del Caos"
-  gender: { type: DataTypes.STRING(50), allowNull: true }, // "Protocolo TCP/IP"
-  classification: { type: DataTypes.STRING(100), allowNull: true }, // "Hechicero Tecnopático"
-  
-  // --- IMÁGENES Y VARIANTES ---
-  // Guardaremos un JSON string: [{ "url": "...", "label": "Base Form" }, { "url": "...", "label": "Rage Mode" }]
-  images: { 
-    type: DataTypes.TEXT, 
+  images: { type: DataTypes.TEXT, defaultValue: '[]' },
+  // ⚠️ NOTA: Eliminamos la columna 'image' singular porque ya usamos 'images'
+
+  tier: {
+    type: DataTypes.STRING(20),
     allowNull: false,
-    defaultValue: '[]' 
+    defaultValue: 'Unknown'
   },
+  
+  // Stats descriptivas
+  attackPotency: { type: DataTypes.TEXT },
+  speed: { type: DataTypes.TEXT },
+  durability: { type: DataTypes.TEXT },
+  weaknesses: { type: DataTypes.TEXT },
+  equipment: { type: DataTypes.TEXT },
 
-  // --- ESTADÍSTICAS WIKI (Texto libre para descripciones complejas) ---
-  tier: { type: DataTypes.STRING(50), defaultValue: 'Unknown' }, // 2-C, 1-A, etc.
-  attackPotency: { type: DataTypes.TEXT, allowNull: true }, // "Nivel Manipulación Mental..."
-  speed: { type: DataTypes.TEXT, allowNull: true }, // "Omnipresente en la red local"
-  durability: { type: DataTypes.TEXT, allowNull: true }, // "Intangible / Firewall Nivel 7"
-  weaknesses: { type: DataTypes.TEXT, allowNull: true }, // "El Timbre de Salida"
-  equipment: { type: DataTypes.TEXT, allowNull: true }, // "Puntero Láser, Cable Ethernet"
-
-  // --- ESTADÍSTICAS NUMÉRICAS (Para el gráfico de barras) ---
+  // Stats numéricas
   strength: { type: DataTypes.INTEGER, defaultValue: 50 },
-  speed_stat: { type: DataTypes.INTEGER, defaultValue: 50 }, // Renombrado para no chocar con el texto
+  speed_stat: { type: DataTypes.INTEGER, defaultValue: 50 },
   durability_stat: { type: DataTypes.INTEGER, defaultValue: 50 },
   intelligence: { type: DataTypes.INTEGER, defaultValue: 50 },
   energy: { type: DataTypes.INTEGER, defaultValue: 50 },
   combat: { type: DataTypes.INTEGER, defaultValue: 50 },
 
-  abilities: { type: DataTypes.TEXT, allowNull: true }, // JSON Array de strings
+  abilities: { type: DataTypes.TEXT },
   
-  creatorId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: { model: 'Users', key: '_id' },
-    onDelete: 'CASCADE'
-  },
+  creatorId: { type: DataTypes.INTEGER, allowNull: false },
   isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
   views: { type: DataTypes.INTEGER, defaultValue: 0 },
-  likes: { type: DataTypes.INTEGER, defaultValue: 0 }
+  
+  likes: { type: DataTypes.INTEGER, defaultValue: 0 },
+  
+  // ✅ ESTA ES LA COLUMNA NUEVA IMPORTANTE
+  likedBy: { type: DataTypes.TEXT, defaultValue: '[]' }
+
 }, {
   timestamps: true
 });
-
-// Helper para calcular poder numérico
-Character.prototype.calculatePowerLevel = function () {
-  return Math.round((this.strength + this.speed_stat + this.durability_stat + this.intelligence + this.energy + this.combat) / 6);
-};
 
 Character.prototype.toJSON = function () {
   const values = { ...this.get() };
   values._id = values._id || values.id;
   delete values.id;
-  values.powerLevel = this.calculatePowerLevel();
   
-  // Parsear JSONs
   try { values.abilities = JSON.parse(values.abilities || '[]'); } catch (e) { values.abilities = []; }
   try { values.images = JSON.parse(values.images || '[]'); } catch (e) { values.images = []; }
+  try { values.likedBy = JSON.parse(values.likedBy || '[]'); } catch (e) { values.likedBy = []; }
   
-  // Compatibilidad con frontend viejo (usa la primera imagen como principal)
-  values.image = values.images.length > 0 ? values.images[0].url : 'https://placehold.co/400x600';
+  // Generamos 'image' al vuelo para que el frontend no se rompa
+  values.image = (values.images && values.images.length > 0) 
+    ? values.images[0].url 
+    : 'https://placehold.co/400x600?text=No+Image';
 
   return values;
 };

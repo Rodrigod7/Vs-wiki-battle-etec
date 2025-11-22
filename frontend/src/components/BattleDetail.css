@@ -1,0 +1,237 @@
+/* frontend/src/components/BattleDetail.css */
+
+.battle-detail {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0a0a1a 100%);
+  color: #ccd6f6;
+  animation: fadeIn 0.5s ease;
+}
+
+.btn-back {
+  background: none;
+  border: 1px solid #64ffda;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: #64ffda;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 2rem;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  background: rgba(100, 255, 218, 0.1);
+  transform: translateX(-5px);
+}
+
+.battle-header-detail {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: rgba(15, 15, 30, 0.6);
+  padding: 2rem;
+  border-radius: 15px;
+  border: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+.battle-title-detail {
+  font-size: 2.5rem;
+  color: #64ffda;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* --- COMBATIENTES --- */
+.combatants-showcase {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.combatant-card {
+  flex: 1;
+  min-width: 280px;
+  max-width: 400px;
+  text-align: center;
+  background: rgba(20, 20, 35, 0.8);
+  padding: 2rem;
+  border-radius: 20px;
+  border: 2px solid rgba(100, 255, 218, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.combatant-card img {
+  width: 180px;
+  height: 180px;
+  border-radius: 15px;
+  object-fit: cover;
+  border: 4px solid #64ffda;
+  margin-bottom: 1rem;
+}
+
+.combatant-card h2 {
+  color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.vs-divider {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ff6b6b;
+  text-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
+  animation: pulse 2s infinite;
+}
+
+/* --- BARRAS DE SIMULACIÓN (ARREGLADAS) --- */
+.simulation-results {
+  background: rgba(15, 15, 30, 0.8);
+  padding: 2rem;
+  border-radius: 15px;
+  margin-bottom: 3rem;
+  border: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+.sim-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sim-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sim-name {
+  width: 120px;
+  text-align: right;
+  font-weight: bold;
+  color: #8892b0;
+}
+
+/* Contenedor gris de fondo para la barra */
+.sim-bar-wrapper {
+  flex: 1;
+  height: 25px;
+  background: #333; /* Fondo oscuro sólido para que se vea */
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Barra de relleno con color sólido */
+.sim-bar-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #000;
+  transition: width 1s ease-out;
+}
+
+.sim-char1 { background: #4dd4ac; } /* Verde sólido */
+.sim-char2 { background: #ff6b6b; } /* Rojo sólido */
+
+
+/* --- VOTACIÓN --- */
+.community-voting {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.vote-options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+/* Botones de Votar Mejorados */
+.vote-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 1.5rem;
+  width: 220px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.vote-btn:hover:not(:disabled) {
+  border-color: #64ffda;
+  background: rgba(100, 255, 218, 0.1);
+  transform: translateY(-5px);
+}
+
+.vote-btn.voted {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.vote-btn img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 2px solid #ccc;
+}
+
+.vote-count {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #64ffda;
+}
+
+/* Barra de Votos de la Comunidad */
+.vote-bar-community {
+  height: 30px;
+  background: #222;
+  border-radius: 15px;
+  overflow: hidden;
+  display: flex;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 2px solid #444;
+}
+
+.vote-segment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #000;
+  transition: width 0.5s ease;
+}
+
+.vote-char1 { background: #4dd4ac; }
+.vote-char2 { background: #ff6b6b; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sim-bar-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+  }
+  .sim-name {
+    text-align: left;
+    width: auto;
+  }
+}

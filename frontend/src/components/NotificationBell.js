@@ -1,5 +1,5 @@
 // src/components/NotificationBell.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './NotificationBell.css';
 
@@ -7,33 +7,42 @@ const NotificationBell = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
 
-  const fetchUnreadCount = async () => {
+  // ✅ Usamos useCallback para poder reusar la función
+  const fetchUnreadCount = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
     try {
-      // Usamos la misma API de conversaciones que ya trae el conteo de no leídos
       const res = await fetch('/api/conversations', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
 
       if (res.ok && data.data) {
-        // Sumamos el 'unreadCount' de todas las conversaciones
         const totalUnread = data.data.reduce((acc, conv) => acc + (conv.unreadCount || 0), 0);
         setUnreadCount(totalUnread);
       }
     } catch (error) {
       console.error("Error obteniendo notificaciones", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUnreadCount();
-    // Polling: Revisar cada 10 segundos
+    
     const interval = setInterval(fetchUnreadCount, 10000);
-    return () => clearInterval(interval);
-  }, []);
+
+    // ✅ Escuchar evento de mensajes leídos (desde ChatWindow)
+    const handleMessagesRead = () => {
+        fetchUnreadCount();
+    };
+    window.addEventListener('messagesRead', handleMessagesRead);
+
+    return () => {
+        clearInterval(interval);
+        window.removeEventListener('messagesRead', handleMessagesRead);
+    };
+  }, [fetchUnreadCount]);
 
   return (
     <div 

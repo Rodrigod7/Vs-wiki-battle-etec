@@ -1,4 +1,4 @@
-/* src/App.css - RE-ADAPTADO A PALETA PROFESIONAL */
+/* src/App.css - ADAPTADO A MODO OSCURO SIN PERDER TU DISEÑO */
 
 /* --- GENERAL & LAYOUT --- */
 .App {
@@ -6,44 +6,46 @@
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  background: #f4f7f6; /* CAMBIO: De gradiente a gris claro */
+  /* CAMBIO: Usamos variable para el fondo principal */
+  background: var(--bg-main); 
   background-attachment: fixed;
+  transition: background 0.3s ease;
 }
 
 .App-header {
-  background: #2c3e50; /* CAMBIO: De gradiente a azul pizarra sólido */
+  /* CAMBIO: Usamos variable para el header (Mantiene tu azul en modo claro) */
+  background: var(--header-bg); 
   min-height: 10vh;
   display: flex;
   flex-direction: row; 
   align-items: center;
   justify-content: flex-start; 
   font-size: calc(10px + 2vmin);
-  color: white;
+  /* CAMBIO: Usamos variable para el texto del header */
+  color: var(--header-text);
   padding: 15px 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* CAMBIO: Sombra más sutil */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
   padding-left: 70px;
   gap: 30px;
-  /* backdrop-filter: blur(10px); */ /* Se quita el blur para un look sólido */
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .App-header h1 {
-  /* CAMBIO: Eliminado gradiente y animación glow */
-  color: #ffffff;
+  color: var(--header-text);
   font-weight: 800;
   letter-spacing: 1px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra simple */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
-/* Se elimina la animación @keyframes glow */
 
 .App-main {
   padding: 40px 20px;
   min-height: 90vh;
   animation: fadeIn 0.5s ease-in;
+  /* CAMBIO: Color de texto general para el contenido */
+  color: var(--text-primary);
 }
 
 /* (Animación fadeIn se mantiene) */
@@ -51,10 +53,16 @@
 .nav-buttons {
   display: flex;
   gap: 15px;
+  align-items: center;
 }
 
 /* --- BUTTONS MEJORADOS (NUEVA PALETA) --- */
 .btn {
+  /* Se mantienen tus estilos de layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 12px 24px;
   border: none;
   border-radius: 12px;
@@ -63,14 +71,17 @@
   font-size: 14px;
   letter-spacing: 0.5px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #3498db; /* CAMBIO: Azul primario sólido */
+  
+  /* CAMBIO: Fondo dinámico (Azul en claro, Brillante en oscuro) */
+  background: var(--accent-primary);
   color: white;
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); /* CAMBIO: Sombra azul */
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
-/* (Efecto ::before se mantiene) */
 .btn::before {
   content: '';
   position: absolute;
@@ -87,32 +98,34 @@
 
 .btn:hover {
   transform: translateY(-3px);
-  background-color: #2980b9; /* CAMBIO: Hover azul oscuro */
-  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5); /* CAMBIO: Sombra azul */
+  /* CAMBIO: Variable para hover */
+  background-color: var(--accent-hover);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5);
 }
 .btn:active { transform: translateY(-1px); }
 
+/* Botones Específicos (Mantienen sus colores por identidad, pero usan variables si quieres) */
 .btn-danger {
-  background: #e74c3c; /* CAMBIO: Rojo sólido */
+  background: #e74c3c;
   box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
 }
 .btn-danger:hover {
-  background: #c0392b; /* CAMBIO: Rojo oscuro */
+  background: #c0392b;
   box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
 }
 
 .btn-seller {
-  background: #f39c12; /* CAMBIO: Naranja sólido */
+  background: #f39c12;
   box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
 }
 .btn-seller:hover {
-  background: #e67e22; /* CAMBIO: Naranja oscuro */
+  background: #e67e22;
   box-shadow: 0 8px 25px rgba(243, 156, 18, 0.6);
 }
 
 .btn-warning {
-  background: #f1c40f; /* CAMBIO: Amarillo sólido */
-  color: #333; /* CAMBIO: Texto oscuro para legibilidad */
+  background: #f1c40f;
+  color: #333;
   box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
 }
 .btn-warning:hover {
@@ -121,17 +134,18 @@
 }
 
 .btn-primary {
-  background: #007bff; /* CAMBIO: Azul primario (diferente) */
+  background: var(--accent-primary); /* Usamos el acento principal */
   box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
 }
 .btn-primary:hover {
-  background: #0069d9;
+  background: var(--accent-hover);
   box-shadow: 0 8px 25px rgba(0, 123, 255, 0.6);
 }
 
 .btn-small {
   padding: 8px 16px;
   font-size: 13px;
+  height: auto;
 }
 
 /* --- MENU TOGGLE BUTTON MEJORADO --- */
@@ -140,7 +154,8 @@
   left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  background: #3498db; /* CAMBIO: Azul primario */
+  /* CAMBIO: Usar variable */
+  background: var(--accent-primary);
   border: none;
   color: white;
   font-size: 24px;
@@ -157,25 +172,26 @@
 }
 .menu-toggle-btn:hover {
   transform: translateY(-50%) scale(1.1);
-  background: #2980b9; /* CAMBIO: Azul oscuro */
+  background: var(--accent-hover);
   box-shadow: 0 6px 20px rgba(52, 152, 219, 0.5);
 }
 
-/* --- SIDEBAR MODERNO (PALETA PROFESIONAL) --- */
+/* --- SIDEBAR --- */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: 280px; 
   height: 100%;
-  /* CAMBIO: Mantenemos el fondo oscuro profesional */
-  background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
-  color: white;
+  /* CAMBIO: Usamos variable para el fondo del sidebar */
+  background: var(--sidebar-bg);
+  color: var(--text-primary); /* Texto adaptativo */
   padding-top: 70px; 
   transform: translateX(-100%);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   box-shadow: 4px 0 30px rgba(0, 0, 0, 0.5);
+  border-right: 1px solid var(--border-color);
 }
 .App.sidebar-open .sidebar { transform: translateX(0); }
 
@@ -191,25 +207,25 @@
 .sidebar-content::-webkit-scrollbar { width: 6px; }
 .sidebar-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
 .sidebar-content::-webkit-scrollbar-thumb {
-  background: #3498db; /* CAMBIO: Azul primario */
+  background: var(--accent-primary);
   border-radius: 10px;
 }
 
 .sidebar h3 {
   margin: 20px 0 15px 0;
   text-align: center;
-  color: #3498db; /* CAMBIO: Color de texto azul */
+  /* CAMBIO: Color de texto adaptativo */
+  color: var(--accent-primary);
   font-size: 1.1em;
   font-weight: 700;
   letter-spacing: 1px;
-  /* CAMBIO: Se elimina el fondo de texto gradiente */
 }
 
 .sidebar-btn {
   width: 100%; 
   text-align: left;
   background: rgba(255, 255, 255, 0.05);
-  color: white;
+  color: var(--text-inverse); /* Texto blanco siempre en sidebar oscuro */
   padding: 14px 18px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -219,13 +235,13 @@
   backdrop-filter: blur(10px);
 }
 .sidebar-btn:hover {
-  background: #3498db; /* CAMBIO: Azul primario sólido */
+  background: var(--accent-primary);
   transform: translateX(5px);
   box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
   border-color: transparent;
+  color: white;
 }
 
-/* Overlay (Sin cambios de color, el blur es la clave) */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -238,20 +254,10 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* --- RESPONSIVE (Sin cambios) --- */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .App-header { padding: 10px 15px; padding-left: 60px; }
   .App-header h1 { font-size: 1.2em; }
   .sidebar { width: 260px; }
   .nav-buttons { flex-direction: column; gap: 8px; }
-}
-.btn-warning {
-  background: #f39c12;
-  color: white;
-  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
-}
-.btn-warning:hover {
-  background: #e67e22;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(243, 156, 18, 0.6);
 }

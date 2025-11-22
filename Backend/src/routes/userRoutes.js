@@ -1,24 +1,21 @@
 // Backend/src/routes/userRoutes.js
 import express from 'express';
-import { 
-  getUsers, 
-  getUserById, 
-  updateUser, 
-  deleteUser 
+import {
+  getUserProfile,
+  searchUsers,
+  getMyProfile,
+  updateMyProfile
 } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// All routes are protected
-router.use(protect);
+// Rutas públicas
+router.get('/profile/:userId', getUserProfile);
+router.get('/search', searchUsers);
 
-router.route('/')
-  .get(getUsers);
-
-router.route('/:id')
-  .get(getUserById)
-  .put(updateUser)
-  .delete(deleteUser);
+// Rutas protegidas
+router.get('/me', protect, getMyProfile);
+router.put('/me', protect, updateMyProfile);
 
 export default router;

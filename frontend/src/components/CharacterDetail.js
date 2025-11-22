@@ -1,9 +1,9 @@
-// frontend/src/components/CharacterDetail.js
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom'; // Importar Link
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { getValidImageUrl } from '../utils/imageHelper'; // ✅ IMPORTAR HELPER
+import { getValidImageUrl } from '../utils/imageHelper';
+import Comments from './Comments'; // ✅ IMPORTAR COMENTARIOS
 import './CharacterDetail.css';
 
 const CharacterDetail = () => {
@@ -13,9 +13,9 @@ const CharacterDetail = () => {
   const [character, setCharacter] = useState(null);
   const [selectedImageIdx, setSelectedImageIdx] = useState(0);
 
+  // Usar ruta relativa para fetch
   const fetchCharacter = useCallback(async () => {
     try {
-      // Ruta relativa
       const res = await fetch(`/api/characters/${id}`);
       const data = await res.json();
       if (res.ok && data.success) {
@@ -30,19 +30,35 @@ const CharacterDetail = () => {
 
   useEffect(() => { fetchCharacter(); }, [fetchCharacter]);
 
+  const handleContactCreator = async () => {
+      if (!isLoggedIn) return toast.error('Inicia sesión para chatear');
+      if (user._id === character.creator._id) return toast.error('No puedes chatear contigo mismo');
+      
+      try {
+          const res = await fetch('/api/conversations', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+              body: JSON.stringify({ participantId: character.creator._id })
+          });
+          const data = await res.json();
+          if(data.success) {
+              sessionStorage.setItem('openConversationId', data.data._id);
+              navigate('/messages');
+          }
+      } catch(e) { toast.error('Error al conectar'); }
+  };
+
   if (!character) return <div className="detail-loading">Cargando...</div>;
 
   const currentImage = character.images && character.images.length > 0 
     ? character.images[selectedImageIdx] 
-    : { url: character.image, label: 'Default' }; // Fallback a la imagen simple
+    : { url: character.image, label: 'Default' };
 
   return (
     <div className="character-detail-container">
-      {/* HEADER & GALERÍA */}
       <div className="detail-header">
         <div className="detail-image-section">
           <div className="main-image-container">
-            {/* ✅ USAR HELPER AQUÍ */}
             <img 
               src={getValidImageUrl(currentImage.url || currentImage)} 
               alt={character.name} 
@@ -51,13 +67,12 @@ const CharacterDetail = () => {
             />
             {currentImage.label && <div className="variant-label">{currentImage.label}</div>}
           </div>
-          {/* Miniaturas */}
           {character.images && character.images.length > 1 && (
             <div className="thumbnails-row">
               {character.images.map((img, idx) => (
                 <img 
                   key={idx} 
-                  src={getValidImageUrl(img.url)} // ✅ USAR HELPER AQUÍ TAMBIÉN
+                  src={getValidImageUrl(img.url)} 
                   className={`thumb ${idx === selectedImageIdx ? 'active' : ''}`} 
                   onClick={() => setSelectedImageIdx(idx)}
                   alt="variant"
@@ -73,11 +88,7 @@ const CharacterDetail = () => {
             {character.alias && <h3 className="alias">"{character.alias}"</h3>}
           </div>
           
-          {character.quote && (
-            <blockquote className="char-quote">
-              "{character.quote}"
-            </blockquote>
-          )}
+          {character.quote && <blockquote className="char-quote">"{character.quote}"</blockquote>}
 
           <div className="wiki-stats-box">
             <p><strong>Origen:</strong> {character.origin || 'Desconocido'}</p>
@@ -88,13 +99,11 @@ const CharacterDetail = () => {
         </div>
       </div>
 
-      {/* LORE */}
       <div className="detail-section">
         <h2>📖 Resumen</h2>
         <p className="description-text">{character.description}</p>
       </div>
 
-      {/* TABLA DE PODER WIKI */}
       <div className="detail-section">
         <h2>⚡ Estadísticas de Combate</h2>
         <div className="wiki-grid">
@@ -106,17 +115,31 @@ const CharacterDetail = () => {
         </div>
       </div>
 
-      {/* PODERES LISTA */}
+      {/* Creador (Con Link al Perfil) */}
       <div className="detail-section">
-        <h2>🔥 Poderes y Habilidades</h2>
-        <div className="abilities-grid">
-          {character.abilities && character.abilities.map((ab, i) => (
-            <span key={i} className="ability-pill">{ab}</span>
-          ))}
+        <h2>👤 Creado por</h2>
+        <div className="creator-card">
+          <img src={character.creator?.avatar || 'https://placehold.co/50'} alt="creator" className="creator-avatar-large"/>
+          <div className="creator-info">
+            {/* ✅ LINK AL PERFIL PÚBLICO */}
+            <h3>
+                <Link to={`/profile/${character.creator?._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {character.creator?.username}
+                </Link>
+            </h3>
+            {isLoggedIn && user?._id !== character.creator?._id && (
+                <button onClick={handleContactCreator} className="btn-contact-small" style={{marginTop: '10px'}}>
+                    💬 Enviar Mensaje
+                </button>
+            )}
+          </div>
         </div>
       </div>
 
-      <button onClick={() => navigate('/')} className="btn-back">Volver</button>
+      {/* ✅ SECCIÓN DE COMENTARIOS */}
+      <Comments characterId={id} />
+
+      <button onClick={() => navigate('/')} className="btn-back" style={{marginTop: '20px'}}>Volver</button>
     </div>
   );
 };

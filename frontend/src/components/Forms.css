@@ -1,20 +1,29 @@
-/* src/components/Forms.css - RE-ADAPTADO A PALETA PROFESIONAL */
+/* src/components/Forms.css - ADAPTADO Y LIMPIO */
+
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+}
 
 .form-container {
-  background: #ffffff; /* CAMBIO: De gradiente a blanco sólido */
+  /* CAMBIO: Variable de fondo */
+  background: var(--bg-paper);
   padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); /* CAMBIO: Sombra más sutil */
+  box-shadow: var(--shadow-card);
   max-width: 450px;
   margin: 40px auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
   text-align: left;
-  border: 1px solid #ddd; /* CAMBIO: Borde simple */
+  border: 1px solid var(--border-color);
   animation: slideUp 0.5s ease;
   position: relative;
   overflow: hidden;
+  /* CAMBIO: Color de texto */
+  color: var(--text-primary);
 }
 
 .form-container::before {
@@ -24,54 +33,78 @@
   left: 0;
   right: 0;
   height: 5px;
-  background: #3498db; /* CAMBIO: Barra azul sólida */
-  /* (Animación shimmer eliminada) */
+  /* CAMBIO: Variable de acento */
+  background: var(--accent-primary);
 }
 
-/* (Animación slideUp se mantiene) */
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.form-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
 .form-container h2 {
   text-align: center;
-  color: #2c3e50; /* CAMBIO: Color de texto oscuro */
-  margin-bottom: 25px;
+  color: var(--text-primary);
+  margin-bottom: 10px;
   font-size: 2em;
   font-weight: 800;
   letter-spacing: 1px;
-  /* CAMBIO: Se elimina el fondo de texto gradiente */
 }
 
+.form-header p {
+  color: var(--text-secondary);
+  font-size: 1.1em;
+}
+
+/* Inputs */
 .form-container input,
 .form-container select,
 .form-container textarea {
   width: 100%;
   padding: 14px 18px;
-  border: 2px solid #e1e8ed;
+  /* CAMBIO: Variables para inputs */
+  border: 2px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
   border-radius: 12px;
   box-sizing: border-box; 
   font-size: 16px;
   transition: all 0.3s ease;
-  background: white;
   font-family: inherit;
 }
 
 .form-container input:focus,
 .form-container select:focus,
 .form-container textarea:focus {
-  border-color: #3498db; /* CAMBIO: Color de foco azul */
+  border-color: var(--accent-primary);
   outline: none;
-  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1); /* CAMBIO: Sombra de foco azul */
+  box-shadow: 0 0 0 4px var(--accent-glow);
   transform: translateY(-2px);
+}
+
+/* Validaciones */
+.form-container input:not(:placeholder-shown):valid {
+  border-color: #2ecc71;
+  /* Icono check en base64 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232ecc71' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+}
+
+.form-container input:invalid:not(:placeholder-shown) { 
+  border-color: #e74c3c; 
 }
 
 .form-container textarea { resize: vertical; min-height: 100px; }
 .form-split { display: flex; gap: 15px; }
 
-/* Botones (Paleta profesional) */
+/* Botones */
 .form-container .btn {
   width: 100%;
   margin-top: 10px;
-  background: #3498db; /* CAMBIO: Azul */
+  background: var(--accent-primary);
   color: white;
   padding: 14px;
   font-weight: 700;
@@ -79,13 +112,13 @@
   cursor: pointer;
   border-radius: 12px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+  box-shadow: 0 4px 15px var(--accent-glow);
   font-size: 16px;
   letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
 }
-/* (Efecto flecha se mantiene) */
+
 .form-container .btn::after {
   content: '→';
   position: absolute;
@@ -95,93 +128,41 @@
   opacity: 0;
   transition: all 0.3s ease;
 }
-.form-container .btn:hover::after { transform: translateY(-50%) translateX(0); opacity: 1; }
+
+.form-container .btn:hover::after { 
+  transform: translateY(-50%) translateX(0); 
+  opacity: 1; 
+}
 
 .form-container .btn:hover {
   transform: translateY(-2px);
-  background: #2980b9; /* CAMBIO: Azul oscuro */
-  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.6);
+  background: var(--accent-hover);
+  box-shadow: 0 8px 25px var(--accent-glow);
 }
+
 .form-container .btn:active { transform: translateY(0); }
 
 .form-container .btn-primary {
-  background: #007bff; /* CAMBIO: Azul primario */
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+  background: var(--accent-primary);
 }
 .form-container .btn-primary:hover {
-  background: #0069d9;
-  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.6);
-}
-
-/* Labels (Sin cambios) */
-.form-container label {
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 5px;
-  display: block;
-  font-size: 14px;
-  letter-spacing: 0.3px;
-}
-
-/* Placeholder (Sin cambios) */
-.form-container input::placeholder,
-.form-container textarea::placeholder { color: #95a5a6; transition: all 0.3s ease; }
-.form-container input:focus::placeholder,
-.form-container textarea:focus::placeholder { transform: translateX(5px); opacity: 0.7; }
-
-/* Indicadores de estado (Sin cambios) */
-.form-container input:valid { border-color: #2ecc71; }
-.form-container input:invalid:not(:placeholder-shown) { border-color: #e74c3c; }
-
-/* Responsive (Sin cambios) */
-@media (max-width: 768px) {
-  .form-container { padding: 30px 25px; margin: 20px; }
-  .form-split { flex-direction: column; }
-}
-/* frontend/src/components/Forms.css */
-
-/* ... (Mantén tus estilos base de .form-container, inputs, etc.) ... */
-
-.form-wrapper {
-  display: flex;
-  justify-content: center;
-  padding-top: 20px;
-}
-
-.register-form {
-  max-width: 500px;
-}
-
-.form-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.form-header h2 {
-  margin-bottom: 10px;
-  color: #2c3e50;
-  font-size: 1.8em;
-}
-
-.form-header p {
-  color: #7f8c8d;
-  font-size: 1.1em;
+  background: var(--accent-hover);
 }
 
 /* Caja de Requisitos */
 .requirements-box {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 15px;
   margin: 20px 0;
   font-size: 0.9em;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .requirements-box h4 {
   margin: 0 0 10px 0;
-  color: #e67e22; /* Naranja para el icono/título */
+  color: #e67e22; /* Mantenemos naranja para destacar */
   font-size: 1em;
 }
 
@@ -194,24 +175,37 @@
   margin-bottom: 5px;
 }
 
-/* Inputs Validados (Borde Verde como en tu imagen) */
-.form-container input:not(:placeholder-shown):valid {
-  border-color: #2ecc71;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232ecc71' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
+/* Labels y Footer */
+.form-container label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  display: block;
+  font-size: 14px;
+  letter-spacing: 0.3px;
 }
 
-.btn-block {
-  width: 100%;
-  padding: 15px;
-  font-size: 1.1em;
-  margin-top: 10px;
+.form-container input::placeholder,
+.form-container textarea::placeholder { 
+  color: var(--text-secondary); 
+  transition: all 0.3s ease; 
+}
+
+.form-container input:focus::placeholder,
+.form-container textarea:focus::placeholder { 
+  transform: translateX(5px); 
+  opacity: 0.7; 
 }
 
 .form-footer {
   text-align: center;
   margin-top: 20px;
   font-size: 0.9em;
-  color: #7f8c8d;
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-container { padding: 30px 25px; margin: 20px; }
+  .form-split { flex-direction: column; }
 }

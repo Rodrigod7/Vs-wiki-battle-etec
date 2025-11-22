@@ -3,13 +3,8 @@ import { Character, User } from '../config/db.js';
 import { validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 
-// @desc    Create a new character
-// @route   POST /api/characters
-// @access  Private
 export const createCharacter = async (req, res) => {
   try {
-    // (Omitimos validación estricta por ahora para agilizar)
-    
     const { 
       name, alias, quote, description, origin, gender, classification,
       images, // Array de objetos { url, label }
@@ -34,8 +29,7 @@ export const createCharacter = async (req, res) => {
       energy: energy || 50,
       combat: combat || 50,
       abilities: abilitiesStr,
-      // Mantenemos compatibilidad con el campo 'image' antiguo usando la primera imagen o default
-      image: (images && images.length > 0) ? images[0].url : 'https://placehold.co/400x600?text=Character',
+      // ❌ ELIMINADO: image: ... (Ya no se guarda aquí)
       creatorId: req.user._id
     });
 
@@ -56,8 +50,6 @@ export const createCharacter = async (req, res) => {
 };
 
 // @desc    Get all characters
-// @route   GET /api/characters
-// @access  Public
 export const getAllCharacters = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -95,18 +87,13 @@ export const getAllCharacters = async (req, res) => {
           }]
         });
         
-        const totalPages = Math.ceil(count / limit);
-        
         res.status(200).json({
           success: true,
           data: characters.map(c => c.toJSON()),
           pagination: {
             currentPage: page,
-            totalPages,
-            totalCharacters: count,
-            charactersPerPage: limit,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1
+            totalPages: Math.ceil(count / limit),
+            totalCharacters: count
           }
         });
       } catch (error) {
@@ -115,9 +102,6 @@ export const getAllCharacters = async (req, res) => {
       }
 };
 
-// @desc    Get single character by ID
-// @route   GET /api/characters/:id
-// @access  Public
 export const getCharacterById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -143,9 +127,6 @@ export const getCharacterById = async (req, res) => {
       }
 };
 
-// @desc    Update character
-// @route   PUT /api/characters/:id
-// @access  Private (Owner only)
 export const updateCharacter = async (req, res) => {
   try {
     const { id } = req.params;
@@ -155,7 +136,6 @@ export const updateCharacter = async (req, res) => {
     if (character.creatorId !== req.user._id) return res.status(403).json({ success: false, message: 'No autorizado' });
 
     const updateData = {};
-    // Lista completa de campos permitidos para actualizar
     const allowedFields = [
       'name', 'alias', 'quote', 'description', 'origin', 'gender', 'classification',
       'images', 'tier', 'attackPotency', 'speed', 'durability', 'weaknesses', 'equipment',
@@ -166,7 +146,6 @@ export const updateCharacter = async (req, res) => {
     allowedFields.forEach(field => {
       if (req.body[field] !== undefined) {
         if ((field === 'abilities' || field === 'images') && typeof req.body[field] !== 'string') {
-           // Si viene como objeto/array, lo stringificamos para la BD
            updateData[field] = JSON.stringify(req.body[field]);
         } else {
            updateData[field] = req.body[field];
@@ -174,11 +153,8 @@ export const updateCharacter = async (req, res) => {
       }
     });
 
-    // Actualizar imagen principal si se actualizaron las imágenes
-    if (req.body.images && req.body.images.length > 0) {
-        updateData.image = req.body.images[0].url;
-    }
-
+    // ❌ ELIMINADO: Actualizar imagen principal
+    
     await character.update(updateData);
     
     const updatedCharacter = await Character.findOne({ 
@@ -193,9 +169,6 @@ export const updateCharacter = async (req, res) => {
   }
 };
 
-// @desc    Delete character (soft delete)
-// @route   DELETE /api/characters/:id
-// @access  Private (Owner only)
 export const deleteCharacter = async (req, res) => {
   try {
     const { id } = req.params;
@@ -212,9 +185,6 @@ export const deleteCharacter = async (req, res) => {
   }
 };
 
-// @desc    Get characters by creator
-// @route   GET /api/characters/creator/:creatorId
-// @access  Public
 export const getCharactersByCreator = async (req, res) => {
   try {
     const { creatorId } = req.params;
@@ -230,18 +200,37 @@ export const getCharactersByCreator = async (req, res) => {
   }
 };
 
-// @desc    Toggle Like
-// @route   POST /api/characters/:id/like
-// @access  Private
 export const toggleLike = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user._id;
+
     const character = await Character.findOne({ where: { _id: id, isActive: true } });
     
     if (!character) return res.status(404).json({ success: false, message: 'Personaje no encontrado' });
     
-    await character.increment('likes');
-    res.status(200).json({ success: true, message: 'Like registrado', data: { likes: character.likes + 1 } });
+    let likedBy = JSON.parse(character.likedBy || '[]');
+    const hasLiked = likedBy.includes(userId);
+
+    if (hasLiked) {
+      likedBy = likedBy.filter(uid => uid !== userId);
+      character.likes = Math.max(0, character.likes - 1);
+    } else {
+      likedBy.push(userId);
+      character.likes += 1;
+    }
+
+    character.likedBy = JSON.stringify(likedBy);
+    await character.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: hasLiked ? 'Like removido' : 'Like registrado', 
+      data: { 
+        likes: character.likes,
+        hasLiked: !hasLiked 
+      } 
+    });
   } catch (error) {
     console.error('Error toggling like:', error);
     res.status(500).json({ success: false, message: 'Error al dar like' });

@@ -11,17 +11,13 @@ const Messaging = () => {
   const [activeConversationId, setActiveConversationId] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // Estados para la búsqueda
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // ✅ CORREGIDO: Eliminado PORT para usar rutas relativas
-
   const fetchConversations = useCallback(async () => {
     const token = localStorage.getItem('token');
     try {
-      // ✅ CORREGIDO: Ruta relativa /api
       const res = await fetch('/api/conversations', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -32,6 +28,17 @@ const Messaging = () => {
     } catch (error) {
       console.error('Error fetching conversations:', error);
     }
+  }, []);
+
+  // ✅ CORREGIDO: Usamos useCallback para evitar que esta función cambie y cause bucles
+  const handleMessagesRead = useCallback((conversationId) => {
+    setConversations(prevConversations => 
+      prevConversations.map(conv => 
+        conv._id === conversationId 
+          ? { ...conv, unreadCount: 0 } 
+          : conv
+      )
+    );
   }, []);
 
   const handleSearch = async (e) => {
@@ -46,7 +53,6 @@ const Messaging = () => {
     setIsSearching(true);
     const token = localStorage.getItem('token');
     try {
-      // ✅ CORREGIDO: Ruta relativa /api
       const res = await fetch(`/api/users?search=${term}&limit=5`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -64,7 +70,6 @@ const Messaging = () => {
   const startConversation = async (userId) => {
     const token = localStorage.getItem('token');
     try {
-      // ✅ CORREGIDO: Ruta relativa /api
       const res = await fetch('/api/conversations', {
         method: 'POST',
         headers: {
@@ -140,7 +145,6 @@ const Messaging = () => {
                   className="search-result-item"
                   onClick={() => startConversation(user._id)}
                 >
-                  {/* ✅ CORREGIDO: Imagen de respaldo con placehold.co */}
                   <img 
                     src={user.avatar || 'https://placehold.co/40'} 
                     alt={user.username} 
@@ -168,7 +172,10 @@ const Messaging = () => {
         </div>
       </div>
       
-      <ChatWindow conversationId={activeConversationId} />
+      <ChatWindow 
+        conversationId={activeConversationId} 
+        onMessagesRead={handleMessagesRead}
+      />
     </div>
   );
 };

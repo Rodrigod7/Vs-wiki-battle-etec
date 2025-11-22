@@ -1,184 +1,173 @@
 // src/components/ChatWindow.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../hooks/useSocket'; 
 import { toast } from 'react-hot-toast';
 import Spinner from './Spinner';
 import './Messaging.css';
 
-const ChatWindow = ({ conversationId }) => {
+const ChatWindow = ({ conversationId, onMessagesRead }) => {
   const { user } = useAuth();
+  const { joinConversation, sendMessage, onNewMessage, offNewMessage } = useSocket();
+  
   const [messages, setMessages] = useState([]);
   const [conversation, setConversation] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  
-  // ✅ CORREGIDO: Eliminado PORT para usar rutas relativas
-  
-  const initialLoadRef = useRef(true); 
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const markMessagesAsRead = useCallback(async () => {
+  // Helper para marcar leído
+  const markAsRead = useCallback(async () => {
     if (!conversationId) return;
     const token = localStorage.getItem('token');
     try {
-      // ✅ CORREGIDO: Ruta relativa /api
       await fetch(`/api/conversations/${conversationId}/messages/read`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (onMessagesRead) onMessagesRead(conversationId);
+      window.dispatchEvent(new Event('messagesRead'));
     } catch (error) {
       console.error('Error marking as read:', error);
     }
-  }, [conversationId]);
+  }, [conversationId, onMessagesRead]);
 
-  const fetchMessages = useCallback(async () => {
+  const fetchHistory = useCallback(async () => {
     if (!conversationId) return;
-    
-    if (initialLoadRef.current) {
-      setLoading(true);
-    }
-    
-    const token = localStorage.getItem('token');
-    
+    setLoading(true);
     try {
-      if (initialLoadRef.current) {
-        // ✅ CORREGIDO: Ruta relativa /api
-        const convRes = await fetch(`/api/conversations/${conversationId}`, {
+      const token = localStorage.getItem('token');
+      
+      const convRes = await fetch(`/api/conversations/${conversationId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const convData = await convRes.json();
-        if (convRes.ok) {
-          setConversation(convData.data);
-        } else {
-          throw new Error(convData.message || 'Error al cargar conversación');
-        }
-      }
+      });
+      const convData = await convRes.json();
+      setConversation(convData.data);
 
-      // ✅ CORREGIDO: Ruta relativa /api
       const msgRes = await fetch(`/api/conversations/${conversationId}/messages`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${token}` }
       });
       const msgData = await msgRes.json();
-      if (msgRes.ok) {
-        setMessages(prevMessages => {
-          if (JSON.stringify(prevMessages) !== JSON.stringify(msgData.data)) {
-            return msgData.data;
-          }
-          return prevMessages;
-        });
-      } else {
-        throw new Error(msgData.message || 'Error al cargar mensajes');
+      if(msgData.success) {
+        setMessages(msgData.data.reverse()); 
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error(error);
     } finally {
-      if (initialLoadRef.current) {
-        setLoading(false);
-        initialLoadRef.current = false;
-      }
+      setLoading(false);
+      scrollToBottom();
     }
   }, [conversationId]);
 
+  // ✅ EFECTO 1: Carga inicial (API)
+  useEffect(() => {
+    if (conversationId) {
+      fetchHistory();
+      markAsRead();
+    }
+  }, [conversationId, fetchHistory, markAsRead]);
+
+  // ✅ EFECTO 2: UNIRSE A LA SALA (Socket)
+  // Este efecto está AISLADO. Solo depende del ID y de la función join.
+  // NO depende de mensajes ni de funciones de lectura.
+  useEffect(() => {
+    if (conversationId) {
+      joinConversation(conversationId);
+    }
+  }, [conversationId, joinConversation]);
+
+  // ✅ EFECTO 3: ESCUCHAR MENSAJES (Socket)
   useEffect(() => {
     if (!conversationId) return;
-    initialLoadRef.current = true;
-    fetchMessages(); 
-    markMessagesAsRead();
-    const intervalId = setInterval(fetchMessages, 5000);
-    return () => clearInterval(intervalId);
-  }, [conversationId, fetchMessages, markMessagesAsRead]);
 
+    const handleNewMessage = (message) => {
+      setMessages((prev) => [...prev, message]);
+      scrollToBottom();
+      markAsRead(); // Marcamos como leído al recibirlo si tenemos el chat abierto
+    };
+
+    onNewMessage(handleNewMessage);
+
+    return () => {
+      offNewMessage();
+    };
+  }, [conversationId, onNewMessage, offNewMessage, markAsRead]);
+
+  // Auto-scroll al renderizar nuevos mensajes
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    const token = localStorage.getItem('token');
+    const content = newMessage;
+    setNewMessage('');
+
     try {
-      // ✅ CORREGIDO: Ruta relativa /api
+      const token = localStorage.getItem('token');
       const res = await fetch(`/api/conversations/${conversationId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ content: newMessage })
+        body: JSON.stringify({ content })
       });
-
       const data = await res.json();
 
       if (res.ok) {
-        setMessages(prevMessages => [...prevMessages, data.data]);
-        setNewMessage('');
+        sendMessage(conversationId, data.data);
+        setMessages((prev) => [...prev, data.data]);
         scrollToBottom();
-        setTimeout(() => markMessagesAsRead(), 500);
-      } else {
-        throw new Error(data.message || 'Error al enviar mensaje');
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error('Error al enviar');
     }
   };
 
-  if (!conversationId) {
-    return <div className="chat-placeholder">Selecciona una conversación para empezar a chatear.</div>;
-  }
-
-  if (loading && !conversation) {
-    return <div className="chat-placeholder"><Spinner size="large" message="Cargando chat..." /></div>;
-  }
+  if (!conversationId) return <div className="chat-placeholder">Selecciona un chat para empezar.</div>;
+  if (loading && !conversation) return <div className="chat-placeholder"><Spinner /></div>;
 
   const otherParticipant = conversation?.participants?.find(p => p._id !== user._id);
-  const headerTitle = otherParticipant ? otherParticipant.username : 'Chat';
-  // ✅ CORREGIDO: Imagen de respaldo con placehold.co
-  const headerAvatar = otherParticipant ? otherParticipant.avatar : 'https://placehold.co/50';
-
+  
   return (
     <div className="chat-window-col">
       <div className="chat-window-header">
         <img 
-          src={headerAvatar} 
-          alt="avatar" 
-          className="conversation-avatar"
-          onError={(e) => e.target.src = 'https://placehold.co/50'} 
+            src={otherParticipant?.avatar || 'https://placehold.co/50'} 
+            alt="avatar" 
+            className="conversation-avatar" 
+            onError={(e) => e.target.src='https://placehold.co/50'}
         />
-        <h4>{headerTitle}</h4>
+        <h4>{otherParticipant?.username || 'Chat'}</h4>
       </div>
       
       <div className="chat-messages">
-        {messages.map((msg) => (
-          <div
-            key={msg._id}
-            className={`message ${msg.sender._id === user._id ? 'message-sent' : 'message-received'}`}
-          >
-            <div className="message-content">
-              {msg.content}
-            </div>
+        {messages.map((msg, index) => (
+          <div key={index} className={`message ${msg.sender._id === user._id ? 'message-sent' : 'message-received'}`}>
+            <div className="message-content">{msg.content}</div>
             <small className="message-time">
-              {new Date(msg.createdAt).toLocaleTimeString('es-AR', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
+                {new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
             </small>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="chat-input-form">
+      <form onSubmit={handleSend} className="chat-input-form">
         <input
           type="text"
           placeholder="Escribe un mensaje..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           className="chat-input"
+          onFocus={markAsRead}
         />
         <button type="submit" className="btn btn-send">Enviar</button>
       </form>

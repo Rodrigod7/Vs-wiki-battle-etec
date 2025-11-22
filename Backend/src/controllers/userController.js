@@ -1,169 +1,145 @@
 // Backend/src/controllers/userController.js
-import { User } from '../config/db.js';
+import { User, Character } from '../config/db.js';
 import { Op } from 'sequelize';
+import bcrypt from 'bcryptjs'; // ✅ IMPORTANTE: Importar bcrypt
 
-// @desc    Get all users
-// @route   GET /api/users
-// @access  Private
-export const getUsers = async (req, res) => {
+// @desc    Get user's public profile
+// @route   GET /api/users/profile/:userId
+// @access  Public
+export const getUserProfile = async (req, res) => {
   try {
-    const { search, page = 1, limit = 10 } = req.query;
-    
-    const limitInt = parseInt(limit);
-    const offset = (parseInt(page) - 1) * limitInt;
-    
-    const whereClause = { isActive: true };
-    
-    // Search by username or email
-    if (search) {
-      whereClause[Op.or] = [
-        { username: { [Op.like]: `%${search}%` } },
-        { email: { [Op.like]: `%${search}%` } }
-      ];
-    }
-    
-    const { count, rows: users } = await User.findAndCountAll({
-      where: whereClause,
-      limit: limitInt,
-      offset: offset,
-      order: [['createdAt', 'DESC']]
+    const { userId } = req.params;
+
+    const user = await User.findByPk(userId, {
+      attributes: ['_id', 'username', 'avatar', 'email', 'createdAt']
     });
 
-    const formattedUsers = users.map(user => user.toJSON());
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    // Obtener personajes del usuario
+    const characters = await Character.findAll({
+      where: { creatorId: userId, isActive: true },
+      order: [['createdAt', 'DESC']],
+      limit: 12
+    });
+
+    // Estadísticas del usuario
+    const totalCharacters = await Character.count({
+      where: { creatorId: userId, isActive: true }
+    });
+
+    const totalViews = await Character.sum('views', {
+      where: { creatorId: userId, isActive: true }
+    });
+
+    const totalLikes = await Character.sum('likes', {
+      where: { creatorId: userId, isActive: true }
+    });
 
     res.status(200).json({
       success: true,
-      data: formattedUsers,
-      pagination: {
-        total: count,
-        page: parseInt(page),
-        pages: Math.ceil(count / limitInt)
+      data: {
+        user: user.toJSON(),
+        characters: characters.map(c => c.toJSON()),
+        stats: {
+          totalCharacters: totalCharacters || 0,
+          totalViews: totalViews || 0,
+          totalLikes: totalLikes || 0
+        }
       }
     });
-
   } catch (error) {
-    console.error('Get users error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error al obtener usuarios',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener perfil' });
   }
 };
 
-// @desc    Get user by ID
-// @route   GET /api/users/:id
-// @access  Private
-export const getUserById = async (req, res) => {
+// @desc    Search users
+// @route   GET /api/users/search
+// @access  Public
+export const searchUsers = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ success: false, message: 'Se requiere un término de búsqueda' });
+    }
+
+    const users = await User.findAll({
+      where: {
+        username: { [Op.like]: `%${query}%` }
+      },
+      attributes: ['_id', 'username', 'avatar'],
+      limit: 10
+    });
+
+    res.status(200).json({
+      success: true,
+      data: users.map(u => u.toJSON())
+    });
+  } catch (error) {
+    console.error('Error searching users:', error);
+    res.status(500).json({ success: false, message: 'Error al buscar usuarios' });
+  }
+};
+
+// @desc    Get current user info
+// @route   GET /api/users/me
+// @access  Private
+export const getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user._id, {
+      attributes: ['_id', 'username', 'email', 'avatar', 'createdAt']
+    });
 
     if (!user) {
-      return res.status(404).json({ 
-        success: false,
-        message: 'Usuario no encontrado' 
-      });
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
     }
 
     res.status(200).json({
       success: true,
       data: user.toJSON()
     });
-
   } catch (error) {
-    console.error('Get user error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error al obtener usuario',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener perfil' });
   }
 };
 
 // @desc    Update user profile
-// @route   PUT /api/users/:id
+// @route   PUT /api/users/me
 // @access  Private
-export const updateUser = async (req, res) => {
+export const updateMyProfile = async (req, res) => {
   try {
-    const { username, email, avatar } = req.body;
-
-    // Check if user is updating their own profile
-    if (req.params.id !== (req.user._id || req.user.id).toString()) {
-      return res.status(403).json({ 
-        success: false,
-        message: 'No autorizado para actualizar este perfil' 
-      });
-    }
-
-    const user = await User.findByPk(req.params.id);
+    const { username, avatar, email, password } = req.body;
+    const user = await User.findByPk(req.user._id);
 
     if (!user) {
-      return res.status(404).json({ 
-        success: false,
-        message: 'Usuario no encontrado' 
-      });
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
     }
 
-    // Update fields
-    if (username) user.username = username;
-    if (email) user.email = email;
-    if (avatar) user.avatar = avatar;
+    const updateData = {};
+    if (username) updateData.username = username;
+    if (avatar) updateData.avatar = avatar;
+    if (email) updateData.email = email;
 
-    await user.save();
+    // ✅ Lógica para actualizar contraseña (hasheada)
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
+
+    await user.update(updateData);
 
     res.status(200).json({
       success: true,
-      message: 'Perfil actualizado exitosamente',
+      message: 'Perfil actualizado',
       data: user.toJSON()
     });
-
   } catch (error) {
-    console.error('Update user error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error al actualizar perfil',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-};
-
-// @desc    Delete user (soft delete)
-// @route   DELETE /api/users/:id
-// @access  Private
-export const deleteUser = async (req, res) => {
-  try {
-    // Check if user is deleting their own account
-    if (req.params.id !== (req.user._id || req.user.id).toString()) {
-      return res.status(403).json({ 
-        success: false,
-        message: 'No autorizado para eliminar esta cuenta' 
-      });
-    }
-
-    const user = await User.findByPk(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ 
-        success: false,
-        message: 'Usuario no encontrado' 
-      });
-    }
-
-    // Soft delete
-    user.isActive = false;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Cuenta desactivada exitosamente'
-    });
-
-  } catch (error) {
-    console.error('Delete user error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error al eliminar cuenta',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    console.error('Error updating profile:', error);
+    res.status(500).json({ success: false, message: 'Error al actualizar perfil' });
   }
 };

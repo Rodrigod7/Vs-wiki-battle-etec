@@ -1,0 +1,282 @@
+/* frontend/src/components/Comments.css - ADAPTADO A MODO CLARO/OSCURO */
+
+.comments-section {
+  /* ✅ Fondo adaptable */
+  background-color: var(--bg-paper);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  animation: fadeIn 0.5s ease;
+}
+
+.comments-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  /* ✅ Color adaptable */
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.comments-loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+/* --- FORMULARIO --- */
+.comment-form {
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  /* ✅ Variables de input */
+  border: 2px solid var(--border-color);
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.3s ease;
+  min-height: 80px;
+}
+
+.comment-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+/* Botón de enviar */
+.btn-primary {
+  align-self: flex-end;
+  /* Usa estilos globales de App.css, pero aseguramos */
+  background-color: var(--accent-primary);
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.no-comments {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  background-color: var(--bg-input);
+  border-radius: 10px;
+  border: 1px dashed var(--border-color);
+}
+
+/* --- LISTA DE COMENTARIOS --- */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.comment-item {
+  /* ✅ Tarjeta individual */
+  background-color: var(--bg-main); /* Un poco más oscuro/claro que el paper */
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.comment-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-primary);
+  object-fit: cover;
+}
+
+.comment-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-author {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.comment-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.comment-content {
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  padding-left: 3.8rem; /* Alinear con el texto, no el avatar */
+  white-space: pre-wrap; /* Respetar saltos de línea */
+}
+
+/* Acciones (Like, Responder, Borrar) */
+.comment-actions {
+  display: flex;
+  gap: 1rem;
+  padding-left: 3.8rem;
+}
+
+.btn-like,
+.btn-reply,
+.btn-delete {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+}
+
+.btn-like:hover {
+  color: var(--accent-primary);
+  background-color: var(--accent-glow);
+}
+
+.btn-reply:hover {
+  color: var(--accent-primary);
+  background-color: var(--accent-glow);
+}
+
+.btn-delete {
+  color: #e74c3c; /* Rojo suave */
+}
+
+.btn-delete:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+}
+
+/* --- RESPUESTAS (Hilos) --- */
+.reply-form {
+  margin-top: 1rem;
+  padding-left: 3.8rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reply-form textarea {
+  margin-bottom: 0.5rem;
+  min-height: 60px;
+}
+
+.reply-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+.btn-secondary:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.replies-list {
+  margin-top: 1rem;
+  padding-left: 3.8rem; /* Indentación para respuestas */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+}
+
+/* Línea conectora vertical */
+.replies-list::before {
+  content: '';
+  position: absolute;
+  left: 1.8rem; /* Ajustado para que quede bajo el avatar principal */
+  top: 0;
+  bottom: 20px;
+  width: 2px;
+  background-color: var(--border-color);
+}
+
+.reply-item {
+  background-color: var(--bg-input); /* Fondo distinto para respuestas */
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.reply-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  object-fit: cover;
+}
+
+.reply-item .comment-content,
+.reply-item .comment-actions {
+  padding-left: 3rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .comments-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .comment-content,
+  .comment-actions,
+  .reply-form,
+  .replies-list {
+    padding-left: 0;
+  }
+  
+  .replies-list::before {
+    display: none; /* Ocultar línea en móvil para ganar espacio */
+  }
+}

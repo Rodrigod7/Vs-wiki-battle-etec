@@ -1,3 +1,4 @@
+// frontend/src/components/UserProfileConfig.js
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -20,8 +21,6 @@ const UserProfileConfig = () => {
   });
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  // ✅ CORREGIDO: Eliminado PORT
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -37,10 +36,11 @@ const UserProfileConfig = () => {
       return;
     }
     setUserId(userPayload.id);
-    const fetchUserData = async (id, token) => {
+    
+    const fetchUserData = async () => {
       try {
-        // ✅ Ruta relativa
-        const res = await fetch(`/api/users/${id}`, {
+        // ✅ CORREGIDO: Usamos /me en lugar de ID explícito
+        const res = await fetch(`/api/users/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -48,7 +48,7 @@ const UserProfileConfig = () => {
           setFormData({
             username: data.data.username || '',
             email: data.data.email || '',
-            role: data.data.role || 'comprador',
+            role: data.data.role || 'usuario',
             avatar: data.data.avatar || '', 
             newPassword: '', confirmNewPassword: ''
           });
@@ -62,7 +62,7 @@ const UserProfileConfig = () => {
         setLoading(false);
       }
     };
-    fetchUserData(userPayload.id, token);
+    fetchUserData();
   }, [isLoggedIn]);
 
   const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -81,8 +81,8 @@ const UserProfileConfig = () => {
     };
 
     try {
-      // ✅ Ruta relativa
-      const res = await fetch(`/api/users/${userId}`, {
+      // ✅ CORREGIDO: Usamos /me para actualizar
+      const res = await fetch(`/api/users/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ const UserProfileConfig = () => {
         <div className="form-section-title">Datos Básicos</div>
         <input type="text" name="username" value={formData.username} onChange={onChange} placeholder="Usuario" />
         <input type="email" name="email" value={formData.email} onChange={onChange} placeholder="Email" />
-        <select name="role" value={formData.role} disabled={true}><option value="comprador">Usuario</option><option value="vendedor">Vendedor</option></select>
+        <select name="role" value={formData.role} disabled={true}><option value="usuario">Usuario</option><option value="vendedor">Vendedor</option></select>
         <div className="form-section-title">Cambiar Contraseña</div>
         <input type="password" name="newPassword" value={formData.newPassword} onChange={onChange} placeholder="Nueva Contraseña" />
         <input type="password" name="confirmNewPassword" value={formData.confirmNewPassword} onChange={onChange} placeholder="Confirmar Contraseña" />
