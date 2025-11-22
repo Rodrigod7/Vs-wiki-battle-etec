@@ -1,0 +1,39 @@
+{
+  "name": "marketplace-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "start:prod": "NODE_ENV=production node src/index.js",
+    "build": "echo \"Build completed - SQLite database will be created on first run\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "marketplace",
+    "express",
+    "sqlite",
+    "sequelize",
+    "jwt",
+    "rest-api"
+  ],
+  "author": "Rodrigo Espinoza",
+  "license": "ISC",
+  "description": "Marketplace API with authentication and messaging",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.13", 
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
