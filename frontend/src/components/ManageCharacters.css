@@ -1,0 +1,142 @@
+/* frontend/src/components/ManageCharacters.css */
+
+.manage-characters-container {
+  max-width: 1000px;
+  margin: 30px auto;
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.manage-characters-container h2 {
+  color: #2c3e50;
+  font-size: 2.2em;
+  font-weight: 800;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #667eea;
+}
+
+.character-management-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.character-management-card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #ecf0f1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.character-management-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+}
+
+.character-image-thumb {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.character-details {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.character-details h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.4em;
+  font-weight: 800;
+  color: #2c3e50;
+}
+
+.char-alias {
+  font-style: italic;
+  color: #7f8c8d;
+  margin: 0 0 8px 0;
+}
+
+.character-details p {
+  margin: 4px 0;
+  font-size: 0.95em;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.character-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.loading-message,
+.error-message {
+  text-align: center;
+  padding: 60px;
+  font-size: 1.2em;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.loading-message {
+  color: #7f8c8d;
+  background: white;
+}
+
+.error-message {
+  color: #e74c3c;
+  background: #fdeae8;
+}
+
+@media (max-width: 768px) {
+  .manage-characters-container {
+    padding: 25px 20px;
+    margin: 20px;
+  }
+
+  .character-management-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .character-image-thumb {
+    width: 100%;
+    height: 200px;
+  }
+
+  .character-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .character-actions button {
+    flex: 1;
+  }
+}

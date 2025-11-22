@@ -1,0 +1,128 @@
+/* src/index.css - RE-ADAPTADO A PALETA PROFESIONAL */
+
+/* Importar fuentes de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f4f7f6; /* CAMBIO: De gradiente neón a gris claro */
+  background-attachment: fixed;
+  color: #2c3e50;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  background: rgba(52, 152, 219, 0.1); /* CAMBIO: Azul claro */
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Scrollbar personalizado global */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f9fa; /* CAMBIO: Blanco/Gris */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3498db; /* CAMBIO: Azul primario */
+  border-radius: 10px;
+  border: 2px solid #f8f9fa;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2980b9; /* CAMBIO: Azul oscuro */
+}
+
+/* Estilos de selección */
+::selection {
+  background: rgba(52, 152, 219, 0.3); /* CAMBIO: Azul primario semi-transparente */
+  color: #1a252f;
+}
+
+::-moz-selection {
+  background: rgba(52, 152, 219, 0.3); /* CAMBIO: Azul primario semi-transparente */
+  color: #1a252f;
+}
+
+/* Tipografía (Sin cambios) */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+}
+h1 { font-size: 2.5em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.75em; }
+h4 { font-size: 1.5em; }
+h5 { font-size: 1.25em; }
+h6 { font-size: 1em; }
+
+p {
+  line-height: 1.6;
+  margin-bottom: 1em;
+}
+
+a {
+  color: #3498db; /* CAMBIO: Azul primario */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #2980b9; /* CAMBIO: Azul oscuro */
+}
+
+/* Utilidades globales (Sin cambios) */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+/* Animaciones globales (Sin cambios) */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+/* Focus styles (Sin cambios) */
+button:focus, input:focus, select:focus, textarea:focus { outline: none; }
+
+/* Responsive typography (Sin cambios) */
+@media (max-width: 768px) {
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.75em; }
+  h3 { font-size: 1.5em; }
+  h4 { font-size: 1.25em; }
+  body { font-size: 14px; }
+}
+
+/* Mejora de legibilidad (Sin cambios) */
+img { max-width: 100%; height: auto; display: block; }
+button { font-family: inherit; }
+
+/* Efectos de carga suave (Sin cambios) */
+#root { animation: fadeIn 0.5s ease; }

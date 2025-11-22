@@ -1,0 +1,257 @@
+/* src/App.css - RE-ADAPTADO A PALETA PROFESIONAL */
+
+/* --- GENERAL & LAYOUT --- */
+.App {
+  text-align: center;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: #f4f7f6; /* CAMBIO: De gradiente a gris claro */
+  background-attachment: fixed;
+}
+
+.App-header {
+  background: #2c3e50; /* CAMBIO: De gradiente a azul pizarra sólido */
+  min-height: 10vh;
+  display: flex;
+  flex-direction: row; 
+  align-items: center;
+  justify-content: flex-start; 
+  font-size: calc(10px + 2vmin);
+  color: white;
+  padding: 15px 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* CAMBIO: Sombra más sutil */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding-left: 70px;
+  gap: 30px;
+  /* backdrop-filter: blur(10px); */ /* Se quita el blur para un look sólido */
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.App-header h1 {
+  /* CAMBIO: Eliminado gradiente y animación glow */
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra simple */
+}
+
+/* Se elimina la animación @keyframes glow */
+
+.App-main {
+  padding: 40px 20px;
+  min-height: 90vh;
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* (Animación fadeIn se mantiene) */
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+/* --- BUTTONS MEJORADOS (NUEVA PALETA) --- */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #3498db; /* CAMBIO: Azul primario sólido */
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); /* CAMBIO: Sombra azul */
+  position: relative;
+  overflow: hidden;
+}
+
+/* (Efecto ::before se mantiene) */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+.btn:hover::before { width: 300px; height: 300px; }
+
+.btn:hover {
+  transform: translateY(-3px);
+  background-color: #2980b9; /* CAMBIO: Hover azul oscuro */
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5); /* CAMBIO: Sombra azul */
+}
+.btn:active { transform: translateY(-1px); }
+
+.btn-danger {
+  background: #e74c3c; /* CAMBIO: Rojo sólido */
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+}
+.btn-danger:hover {
+  background: #c0392b; /* CAMBIO: Rojo oscuro */
+  box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+}
+
+.btn-seller {
+  background: #f39c12; /* CAMBIO: Naranja sólido */
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+}
+.btn-seller:hover {
+  background: #e67e22; /* CAMBIO: Naranja oscuro */
+  box-shadow: 0 8px 25px rgba(243, 156, 18, 0.6);
+}
+
+.btn-warning {
+  background: #f1c40f; /* CAMBIO: Amarillo sólido */
+  color: #333; /* CAMBIO: Texto oscuro para legibilidad */
+  box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
+}
+.btn-warning:hover {
+  background: #d4ac0d;
+  box-shadow: 0 8px 25px rgba(241, 196, 15, 0.6);
+}
+
+.btn-primary {
+  background: #007bff; /* CAMBIO: Azul primario (diferente) */
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+.btn-primary:hover {
+  background: #0069d9;
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.6);
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+/* --- MENU TOGGLE BUTTON MEJORADO --- */
+.menu-toggle-btn {
+  position: absolute; 
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #3498db; /* CAMBIO: Azul primario */
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1001;
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+.menu-toggle-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: #2980b9; /* CAMBIO: Azul oscuro */
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.5);
+}
+
+/* --- SIDEBAR MODERNO (PALETA PROFESIONAL) --- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px; 
+  height: 100%;
+  /* CAMBIO: Mantenemos el fondo oscuro profesional */
+  background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+  color: white;
+  padding-top: 70px; 
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.5);
+}
+.App.sidebar-open .sidebar { transform: translateX(0); }
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  gap: 12px;
+  overflow-y: auto;
+  height: calc(100% - 70px);
+}
+
+.sidebar-content::-webkit-scrollbar { width: 6px; }
+.sidebar-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: #3498db; /* CAMBIO: Azul primario */
+  border-radius: 10px;
+}
+
+.sidebar h3 {
+  margin: 20px 0 15px 0;
+  text-align: center;
+  color: #3498db; /* CAMBIO: Color de texto azul */
+  font-size: 1.1em;
+  font-weight: 700;
+  letter-spacing: 1px;
+  /* CAMBIO: Se elimina el fondo de texto gradiente */
+}
+
+.sidebar-btn {
+  width: 100%; 
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+.sidebar-btn:hover {
+  background: #3498db; /* CAMBIO: Azul primario sólido */
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+  border-color: transparent;
+}
+
+/* Overlay (Sin cambios de color, el blur es la clave) */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+/* --- RESPONSIVE (Sin cambios) --- */
+@media (max-width: 768px) {
+  .App-header { padding: 10px 15px; padding-left: 60px; }
+  .App-header h1 { font-size: 1.2em; }
+  .sidebar { width: 260px; }
+  .nav-buttons { flex-direction: column; gap: 8px; }
+}
+.btn-warning {
+  background: #f39c12;
+  color: white;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+}
+.btn-warning:hover {
+  background: #e67e22;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(243, 156, 18, 0.6);
+}
