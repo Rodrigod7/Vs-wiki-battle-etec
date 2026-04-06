@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 4000;
 // ========== CONFIGURACIÓN DE SOCKET.IO ==========
 const io = new Server(httpServer, {
   cors: {
-    origin: '*',
+    origin: true,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -91,7 +91,7 @@ app.set('connectedUsers', connectedUsers);
 
 // ========== MIDDLEWARE ==========
 app.use(cors({
-  origin: '*',
+  origin: true,
   credentials: true
 }));
 app.use(express.json());

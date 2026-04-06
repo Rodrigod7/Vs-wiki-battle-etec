@@ -29,7 +29,7 @@ export const register = async (req, res) => {
 
     const { username, email, password } = req.body;
 
-    const existingUser = await User.findOne({ 
+    const existingUser = await User.scope(null).findOne({ 
       where: { [Op.or]: [{ email }, { username }] }
     });
 
@@ -43,10 +43,15 @@ export const register = async (req, res) => {
     // Generar token de verificación
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
+    // Generar hash de la contraseña antes de guardar
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = await User.create({
       username,
       email,
-      password,
+      password: hashedPassword,
+      isActive: true, // Aseguramos que nace activo
       role: 'usuario',
       isVerified: false, // Nace sin verificar
       verificationToken
@@ -63,6 +68,14 @@ export const register = async (req, res) => {
 
   } catch (error) {
     console.error('Register error:', error);
+    
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'El email o nombre de usuario ya está registrado' 
+      });
+    }
+
     res.status(500).json({ success: false, message: 'Error al registrar usuario' });
   }
 };
@@ -78,7 +91,7 @@ export const login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
     }
 
-    if (!user.isActive) {
+    if (user.isActive === false) {
       return res.status(403).json({ success: false, message: 'Cuenta desactivada' });
     }
 
@@ -92,10 +105,14 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
+    // Omitir la contraseña en la respuesta
+    const userData = user.toJSON();
+    delete userData.password;
+
     res.status(200).json({
       success: true,
       message: 'Login exitoso',
-      data: { user: user.toJSON(), token }
+      data: { user: userData, token }
     });
 
   } catch (error) {
@@ -123,10 +140,14 @@ export const verifyEmail = async (req, res) => {
     // Opcional: Auto-login al verificar
     const jwtToken = generateToken(user);
 
+    // Omitir la contraseña en la respuesta
+    const userData = user.toJSON();
+    delete userData.password;
+
     res.status(200).json({
       success: true,
       message: 'Email verificado exitosamente',
-      data: { user: user.toJSON(), token: jwtToken }
+      data: { user: userData, token: jwtToken }
     });
 
   } catch (error) {
@@ -140,7 +161,11 @@ export const getMe = async (req, res) => {
   try {
     const user = req.user;
     if (!user) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
-    res.status(200).json({ success: true, data: user.toJSON() });
+    
+    const userData = user.toJSON();
+    delete userData.password;
+    
+    res.status(200).json({ success: true, data: userData });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al obtener perfil' });
   }

@@ -11,8 +11,8 @@ const VerifyEmail = () => {
   const { login } = useAuth();
   const [status, setStatus] = useState('verifying'); // Estados: verifying, success, error
 
-  // URL de tu backend (Asegúrate que coincida con tu .env del frontend)
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+  // ✅ CORREGIDO: Usamos ruta relativa para evitar el error de red local
+  const API_URL = process.env.REACT_APP_API_URL || '/api';
 
   useEffect(() => {
     const verifyAccount = async () => {
