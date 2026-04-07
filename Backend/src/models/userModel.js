@@ -32,10 +32,10 @@ const User = sequelize.define('User', {
     defaultValue: 'usuario',
     comment: 'Rol del usuario en la plataforma'
   },
-  // ✅ CORREGIDO: Imagen por defecto
   avatar: {
     type: DataTypes.STRING,
-    defaultValue: 'https://placehold.co/150'
+    defaultValue: null,
+    allowNull: true
   },
   isVerified: {
     type: DataTypes.BOOLEAN,

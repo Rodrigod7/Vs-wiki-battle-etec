@@ -14,9 +14,9 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendVerificationEmail = async (email, token) => {
-  // El link apunta DIRECTO al backend — funciona desde cualquier dispositivo
-  const backendUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 4000}`;
-  const verificationUrl = `${backendUrl}/api/auth/verify-email-page/${token}`;
+  // Usar la URL pública (ngrok/producción) para que funcione desde cualquier dispositivo
+  const baseUrl = process.env.BACKEND_URL || process.env.FRONTEND_URL || `http://localhost:${process.env.PORT || 4000}`;
+  const verificationUrl = `${baseUrl}/api/auth/verify-email-page/${token}`;
 
   const mailOptions = {
     from: '"VS Wiki Battle ETEC" <no-reply@vswiki.com>',
