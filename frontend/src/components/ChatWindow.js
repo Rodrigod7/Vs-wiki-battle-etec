@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../hooks/useSocket'; 
 import { toast } from 'react-hot-toast';
 import Spinner from './Spinner';
+import { getDefaultAvatar } from '../utils/avatarHelper';
 import './Messaging.css';
 
 const ChatWindow = ({ conversationId, onMessagesRead }) => {
@@ -140,10 +141,10 @@ const ChatWindow = ({ conversationId, onMessagesRead }) => {
     <div className="chat-window-col">
       <div className="chat-window-header">
         <img 
-            src={otherParticipant?.avatar || 'https://placehold.co/50'} 
+            src={otherParticipant?.avatar || getDefaultAvatar(otherParticipant?.username, 50)} 
             alt="avatar" 
             className="conversation-avatar" 
-            onError={(e) => e.target.src='https://placehold.co/50'}
+            onError={(e) => { e.target.src = getDefaultAvatar(otherParticipant?.username, 50); }}
         />
         <h4>{otherParticipant?.username || 'Chat'}</h4>
       </div>

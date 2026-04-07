@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import './BattleGallery.css';
 
 const BattleGallery = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [battles, setBattles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('recent');
@@ -37,6 +39,27 @@ const BattleGallery = () => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleDeleteBattle = async (e, battleId) => {
+    e.stopPropagation();
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta batalla?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/battles/${battleId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast.success('Batalla eliminada');
+        fetchBattles();
+      } else {
+        toast.error(data.message || 'Error al eliminar');
+      }
+    } catch (error) {
+      toast.error('Error al eliminar la batalla');
     }
   };
 
@@ -85,6 +108,15 @@ const BattleGallery = () => {
                 <div className="battle-card-header">
                   <span className="battle-views">👁️ {battle.views}</span>
                   <span className="battle-votes">🗳️ {battle.totalVotes}</span>
+                  {user && battle.creatorId === user._id && (
+                    <button
+                      className="btn-delete-battle"
+                      onClick={(e) => handleDeleteBattle(e, battle._id)}
+                      title="Eliminar batalla"
+                    >
+                      🗑️
+                    </button>
+                  )}
                 </div>
 
                 <div className="battle-combatants-preview">
@@ -111,10 +143,11 @@ const BattleGallery = () => {
                 </div>
 
                 <div className="battle-winner-indicator">
-                  🏆 Ganador Matemático:{' '}
-                  {battle.simulationWinnerId === battle.character1._id
-                    ? battle.character1.name
-                    : battle.character2.name}
+                  {battle.simulationWinnerId
+                    ? `🏆 Ganador: ${battle.simulationWinnerId === battle.character1._id
+                        ? battle.character1.name
+                        : battle.character2.name}`
+                    : '🤝 Empate'}
                 </div>
               </div>
             ))}

@@ -51,6 +51,87 @@
   color: #8892b0;
 }
 
+/* Friend action buttons */
+.btn-friend-action {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.btn-add-friend {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+.btn-add-friend:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.btn-pending {
+  background: #95a5a6;
+  color: white;
+  cursor: default;
+}
+
+.btn-chat-friend {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+}
+
+.btn-chat-friend:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+}
+
+.btn-remove-friend {
+  background: transparent;
+  border: 2px solid #e74c3c;
+  color: #e74c3c;
+}
+
+.btn-remove-friend:hover:not(:disabled) {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-accept-profile {
+  background: #2ecc71;
+  color: white;
+}
+
+.btn-accept-profile:hover:not(:disabled) {
+  background: #27ae60;
+}
+
+.btn-reject-profile {
+  background: transparent;
+  border: 2px solid #e74c3c;
+  color: #e74c3c;
+}
+
+.btn-reject-profile:hover:not(:disabled) {
+  background: #e74c3c;
+  color: white;
+}
+
+.friend-request-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-friend-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .profile-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -183,6 +264,58 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* === LIGHT MODE OVERRIDES === */
+body.light-mode .user-profile {
+  background: var(--bg-main);
+}
+body.light-mode .profile-header {
+  background: var(--bg-paper);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-card);
+}
+body.light-mode .profile-avatar {
+  border-color: var(--accent-primary);
+  box-shadow: 0 10px 30px var(--accent-glow);
+}
+body.light-mode .profile-username {
+  color: var(--accent-primary);
+  text-shadow: none;
+}
+body.light-mode .profile-email { color: var(--text-secondary); }
+body.light-mode .profile-joined { color: var(--text-secondary); }
+body.light-mode .stat-card {
+  background: var(--bg-paper);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-card);
+}
+body.light-mode .stat-card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+}
+body.light-mode .stat-value { color: var(--accent-primary); }
+body.light-mode .stat-label { color: var(--text-secondary); }
+body.light-mode .profile-characters-section {
+  background: var(--bg-paper);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-card);
+}
+body.light-mode .section-title { color: var(--accent-primary); }
+body.light-mode .no-characters { color: var(--text-secondary); }
+body.light-mode .character-card {
+  background: var(--bg-paper);
+  border-color: var(--border-color);
+}
+body.light-mode .character-card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+}
+body.light-mode .char-tier-badge {
+  background: var(--accent-primary);
+  color: white;
+}
+body.light-mode .char-details .char-name { color: var(--text-primary); }
+body.light-mode .char-details .char-alias { color: var(--text-secondary); }
 
 .char-stats-mini {
   display: flex;

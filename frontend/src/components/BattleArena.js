@@ -2,7 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { getValidImageUrl } from '../utils/imageHelper';
 import './BattleArena.css';
+
+// Simple markdown renderer for **bold** and *italic*
+const renderNarrativeText = (text) => {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
 
 const BattleArena = () => {
   const navigate = useNavigate();
@@ -85,7 +101,7 @@ const BattleArena = () => {
     <div className="battle-arena">
       <div className="arena-header">
         <h1 className="arena-title">⚔️ ARENA DE BATALLA ⚔️</h1>
-        <p className="arena-subtitle">Selecciona dos personajes y descubre quién ganaría según su Tier</p>
+        <p className="arena-subtitle">Selecciona dos personajes y el algoritmo analizará todas sus estadísticas para simular una batalla</p>
       </div>
 
       <div className="character-selection">
@@ -172,14 +188,15 @@ const BattleArena = () => {
 
       {battleResult && (
         <div className="battle-results">
-          <h2 className="results-title">📊 RESULTADO</h2>
+          <h2 className="results-title">📊 ANÁLISIS DE BATALLA</h2>
 
-          {/* Solo mostramos las barras de probabilidad (basadas en Tier) */}
+          {/* Probability bars */}
           <div className="probability-bars">
             <div className="prob-container">
               <div className="prob-label">
-                <img src={battleResult.character1.image} alt="c1" />
+                <img src={getValidImageUrl(battleResult.character1.image)} alt="c1" onError={(e) => e.target.src = 'https://placehold.co/40'} />
                 <span>{battleResult.character1.name} ({battleResult.character1.tier})</span>
+                <span className="prob-score">{battleResult.scoreChar1} pts</span>
               </div>
               <div className="prob-bar-wrapper">
                 <div className="prob-bar char1-bar" style={{ width: `${battleResult.winProbabilityChar1}%` }}>
@@ -187,11 +204,11 @@ const BattleArena = () => {
                 </div>
               </div>
             </div>
-
             <div className="prob-container">
               <div className="prob-label">
-                <img src={battleResult.character2.image} alt="c2" />
+                <img src={getValidImageUrl(battleResult.character2.image)} alt="c2" onError={(e) => e.target.src = 'https://placehold.co/40'} />
                 <span>{battleResult.character2.name} ({battleResult.character2.tier})</span>
+                <span className="prob-score">{battleResult.scoreChar2} pts</span>
               </div>
               <div className="prob-bar-wrapper">
                 <div className="prob-bar char2-bar" style={{ width: `${battleResult.winProbabilityChar2}%` }}>
@@ -201,25 +218,61 @@ const BattleArena = () => {
             </div>
           </div>
 
-          <div className="winner-announcement">
-            <h3>🏆 GANADOR MATEMÁTICO:</h3>
-            <div className="winner-card">
-              <img
-                src={battleResult.simulationWinnerId === battleResult.character1._id 
-                  ? battleResult.character1.image 
-                  : battleResult.character2.image}
-                alt="Winner"
-              />
-              <h2>
-                {battleResult.simulationWinnerId === battleResult.character1._id
-                  ? battleResult.character1.name
-                  : battleResult.character2.name}
-              </h2>
+          {/* Narrative sections */}
+          {battleResult.battleNarrative && battleResult.battleNarrative.map((section, idx) => (
+            <div key={idx} className={`narrative-section ${section.winner === 1 ? 'adv-char1' : section.winner === 2 ? 'adv-char2' : 'adv-tie'}`}
+              style={{ animationDelay: `${idx * 0.15}s` }}>
+              <h3 className="narrative-title">{section.title}</h3>
+              <div className="narrative-text">{section.text.split('\n').map((line, li) => (
+                <p key={li} className={line.trim() === '' ? 'narrative-break' : ''}>{renderNarrativeText(line)}</p>
+              ))}</div>
+              {section.winner !== undefined && idx < (battleResult.battleNarrative.length - 1) && (
+                <div className="narrative-advantage">
+                  {section.winner === 1 ? `✅ Ventaja: ${battleResult.character1.name}` :
+                   section.winner === 2 ? `✅ Ventaja: ${battleResult.character2.name}` :
+                   '🤝 Empate en esta categoría'}
+                </div>
+              )}
             </div>
+          ))}
+
+          {/* Winner announcement */}
+          <div className="winner-announcement">
+            {battleResult.simulationWinnerId ? (
+              <>
+                <h3>🏆 GANADOR:</h3>
+                <div className="winner-card">
+                  <img
+                    src={getValidImageUrl(
+                      battleResult.simulationWinnerId === battleResult.character1._id
+                        ? battleResult.character1.image
+                        : battleResult.character2.image
+                    )}
+                    alt="Winner"
+                    onError={(e) => e.target.src = 'https://placehold.co/150'}
+                  />
+                  <h2>
+                    {battleResult.simulationWinnerId === battleResult.character1._id
+                      ? battleResult.character1.name
+                      : battleResult.character2.name}
+                  </h2>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3>🤝 EMPATE</h3>
+                <div className="tie-card">
+                  <img src={getValidImageUrl(battleResult.character1.image)} alt="c1" onError={(e) => e.target.src = 'https://placehold.co/100'} />
+                  <span className="tie-vs">VS</span>
+                  <img src={getValidImageUrl(battleResult.character2.image)} alt="c2" onError={(e) => e.target.src = 'https://placehold.co/100'} />
+                </div>
+                <p className="tie-text">Ambos combatientes están tan igualados que no se puede determinar un ganador claro.</p>
+              </>
+            )}
           </div>
 
           <button onClick={() => navigate(`/battle/${battleResult._id}`)} className="btn-view-full">
-            Ver Votación de la Comunidad
+            Ver Votación de la Comunidad →
           </button>
         </div>
       )}

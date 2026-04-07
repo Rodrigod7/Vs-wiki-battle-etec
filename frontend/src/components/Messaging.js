@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import ConversationList from './ConversationList';
 import ChatWindow from './ChatWindow';
 import Spinner from './Spinner';
+import { getDefaultAvatar } from '../utils/avatarHelper';
 import './Messaging.css';
 
 const Messaging = () => {
@@ -146,10 +147,10 @@ const Messaging = () => {
                   onClick={() => startConversation(user._id)}
                 >
                   <img 
-                    src={user.avatar || 'https://placehold.co/40'} 
+                    src={user.avatar || getDefaultAvatar(user.username, 40)} 
                     alt={user.username} 
                     className="search-avatar"
-                    onError={(e) => e.target.src = 'https://placehold.co/40'}
+                    onError={(e) => { e.target.src = getDefaultAvatar(user.username, 40); }}
                   />
                   <div className="search-info">
                     <span className="search-username">{user.username}</span>

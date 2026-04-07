@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'; // Importar Lin
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { getValidImageUrl } from '../utils/imageHelper';
+import { getDefaultAvatar } from '../utils/avatarHelper';
 import Comments from './Comments'; // ✅ IMPORTAR COMENTARIOS
 import './CharacterDetail.css';
 
@@ -115,11 +116,25 @@ const CharacterDetail = () => {
         </div>
       </div>
 
+      {character.abilities && character.abilities.length > 0 && (
+        <div className="detail-section">
+          <h2>✨ Poderes</h2>
+          <div className="abilities-grid">
+            {character.abilities.map((ability, index) => (
+              <div key={index} className="ability-card">
+                <span className="ability-icon">⚡</span>
+                {ability}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Creador (Con Link al Perfil) */}
       <div className="detail-section">
         <h2>👤 Creado por</h2>
         <div className="creator-card">
-          <img src={character.creator?.avatar || 'https://placehold.co/50'} alt="creator" className="creator-avatar-large"/>
+          <img src={character.creator?.avatar || getDefaultAvatar(character.creator?.username, 50)} alt="creator" className="creator-avatar-large" onError={(e) => { e.target.src = getDefaultAvatar(character.creator?.username, 50); }}/>
           <div className="creator-info">
             {/* ✅ LINK AL PERFIL PÚBLICO */}
             <h3>

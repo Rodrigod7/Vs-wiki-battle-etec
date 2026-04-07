@@ -1,6 +1,6 @@
 // src/context/AuthContext.js (MODIFICADO)
 
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 
 // 1. Crear el Contexto
@@ -20,18 +20,18 @@ export const AuthProvider = ({ children }) => {
 
     const isLoggedIn = !!user;
 
-    const login = (userData, token) => {
+    const login = useCallback((userData, token) => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(userData)); 
         setUser(userData); 
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('user'); 
         setUser(null); 
         toast.success('Sesión cerrada correctamente.'); 
-    };
+    }, []);
 
     // --- ¡NUEVA FUNCIÓN! ---
     // La usamos para actualizar el 'user' en el contexto y localStorage

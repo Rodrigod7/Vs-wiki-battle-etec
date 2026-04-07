@@ -3,38 +3,6 @@ const API_URL = process.env.REACT_APP_API_URL || '/api';
 const getToken = () => localStorage.getItem('token');
 
 export const api = {
-  products: {
-    getAll: async (queryParams = '') => {
-      const res = await fetch(`${API_URL}/products?${queryParams}`);
-      return res.json();
-    },
-    getById: async (id) => {
-      const res = await fetch(`${API_URL}/products/${id}`);
-      return res.json();
-    },
-    getBySeller: async (sellerId) => {
-      const res = await fetch(`${API_URL}/products/seller/${sellerId}`);
-      return res.json();
-    },
-    create: async (productData) => {
-      const res = await fetch(`${API_URL}/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`
-        },
-        body: JSON.stringify(productData)
-      });
-      return res.json();
-    },
-    delete: async (id) => {
-      const res = await fetch(`${API_URL}/products/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${getToken()}` }
-      });
-      return res.json();
-    }
-  },
   auth: {
     login: async (credentials) => {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -85,14 +53,14 @@ export const api = {
       });
       return res.json();
     },
-    create: async (participantId, productId) => {
+    create: async (participantId) => {
       const res = await fetch(`${API_URL}/conversations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getToken()}`
         },
-        body: JSON.stringify({ participantId, productId })
+        body: JSON.stringify({ participantId })
       });
       return res.json();
     },

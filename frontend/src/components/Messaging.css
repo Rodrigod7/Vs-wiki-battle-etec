@@ -336,3 +336,531 @@
      display: none;
   }
 }
+
+/* === DARK MODE OVERRIDES === */
+body.dark-mode .messaging-container {
+  background: var(--bg-paper);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-card);
+}
+body.dark-mode .conversation-list-col {
+  background: var(--bg-main);
+  border-right-color: var(--border-color);
+}
+body.dark-mode .conversation-list-header {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+}
+body.dark-mode .user-search-container {
+  background: var(--bg-paper);
+  border-bottom-color: var(--border-color);
+}
+body.dark-mode .user-search-input {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+body.dark-mode .user-search-input:focus {
+  border-color: var(--accent-primary);
+  background: var(--bg-paper);
+}
+body.dark-mode .search-result-item { border-bottom-color: var(--border-color); }
+body.dark-mode .search-result-item:hover { background-color: var(--bg-hover); }
+body.dark-mode .search-username { color: var(--text-primary); }
+body.dark-mode .search-email { color: var(--text-secondary); }
+body.dark-mode .search-spinner,
+body.dark-mode .no-results { color: var(--text-secondary); }
+body.dark-mode .conversation-item {
+  border-bottom-color: var(--border-color);
+}
+body.dark-mode .conversation-item:hover {
+  background-color: var(--bg-hover);
+}
+body.dark-mode .conversation-item.active {
+  background-color: var(--accent-primary);
+}
+body.dark-mode .conversation-avatar { border-color: var(--accent-primary); }
+body.dark-mode .conversation-info h5 { color: var(--text-primary); }
+body.dark-mode .conversation-info p { color: var(--text-secondary); }
+body.dark-mode .chat-window-col { background: var(--bg-paper); }
+body.dark-mode .chat-window-header {
+  border-bottom-color: var(--border-color);
+  background: var(--bg-paper);
+}
+body.dark-mode .chat-window-header h4 { color: var(--text-primary); }
+body.dark-mode .chat-messages {
+  background: var(--bg-main);
+}
+body.dark-mode .message-received .message-content {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+body.dark-mode .message-time { color: var(--text-secondary); }
+body.dark-mode .chat-input-form {
+  background: var(--bg-paper);
+  border-top-color: var(--border-color);
+}
+body.dark-mode .chat-input {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+body.dark-mode .chat-input:focus {
+  border-color: var(--accent-primary);
+}
+body.dark-mode .btn-send {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+}
+
+/* ============================================
+   NEW: Chat placeholder, avatar wrappers,
+   typing indicator, online status, header info
+   ============================================ */
+
+/* Chat placeholder (no conversation selected) */
+.chat-placeholder-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-placeholder {
+  text-align: center;
+  color: #7f8c8d;
+}
+
+.chat-placeholder h3 {
+  margin: 10px 0 5px;
+  color: #2c3e50;
+  font-size: 1.3em;
+}
+
+.chat-placeholder p {
+  margin: 0;
+  font-size: 0.95em;
+}
+
+/* Avatar wrapper with online dot overlay */
+.conv-avatar-wrapper,
+.chat-header-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.conv-avatar-wrapper .online-dot,
+.chat-header-avatar-wrapper .online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+}
+
+/* Online dot */
+.online-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.online-dot.online {
+  background-color: #2ecc71;
+}
+
+.online-dot.offline {
+  background-color: #95a5a6;
+}
+
+/* Chat header info */
+.chat-header-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header-info h4 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.chat-header-status {
+  font-size: 0.8em;
+  color: #7f8c8d;
+}
+
+/* Conversation info top row */
+.conv-info-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.online-text {
+  font-size: 0.75em;
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  align-self: flex-start;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #95a5a6;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.typing-text {
+  font-size: 0.8em;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* Mobile back button */
+.btn-back-mobile {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: #2c3e50;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .btn-back-mobile {
+    display: inline-block;
+  }
+}
+
+/* === DARK MODE for new components === */
+body.dark-mode .chat-placeholder {
+  color: var(--text-secondary);
+}
+body.dark-mode .chat-placeholder h3 {
+  color: var(--text-primary);
+}
+body.dark-mode .chat-header-info h4 {
+  color: var(--text-primary);
+}
+body.dark-mode .chat-header-status {
+  color: var(--text-secondary);
+}
+body.dark-mode .online-dot {
+  border-color: var(--bg-paper);
+}
+body.dark-mode .typing-text {
+  color: var(--text-secondary);
+}
+body.dark-mode .typing-dot {
+  background-color: var(--text-secondary);
+}
+body.dark-mode .btn-back-mobile {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   TABS & FRIENDS SYSTEM
+   ============================================ */
+
+/* Messaging tabs */
+.messaging-tabs {
+  display: flex;
+  border-bottom: 2px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.msg-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #7f8c8d;
+  transition: all 0.2s;
+  position: relative;
+  white-space: nowrap;
+}
+
+.msg-tab:hover {
+  background: #ecf0f1;
+  color: #2c3e50;
+}
+
+.msg-tab.active {
+  color: #3498db;
+  background: #eaf6ff;
+}
+
+.msg-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #3498db;
+  border-radius: 3px 3px 0 0;
+}
+
+.pending-badge {
+  display: inline-block;
+  background: #e74c3c;
+  color: white;
+  font-size: 0.75em;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* Friends list */
+.friends-list,
+.pending-list {
+  padding: 5px 0;
+}
+
+.friend-item,
+.pending-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.friend-item:hover,
+.pending-item:hover {
+  background: #f8f9fa;
+}
+
+.friend-avatar,
+.pending-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3498db;
+  flex-shrink: 0;
+}
+
+.friend-info,
+.pending-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.friend-username,
+.pending-username {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 0.95em;
+}
+
+.friend-since,
+.pending-date {
+  font-size: 0.78em;
+  color: #95a5a6;
+}
+
+.search-hint {
+  font-size: 0.78em;
+  color: #95a5a6;
+}
+
+.friend-actions,
+.pending-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-friend-chat {
+  background: none;
+  border: 2px solid #3498db;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-friend-chat:hover {
+  background: #3498db;
+  transform: scale(1.1);
+}
+
+.btn-friend-remove {
+  background: none;
+  border: 2px solid #e74c3c;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 0.9em;
+  color: #e74c3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-friend-remove:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-accept {
+  padding: 6px 14px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-accept:hover {
+  background: #27ae60;
+  transform: translateY(-1px);
+}
+
+.btn-reject {
+  padding: 6px 10px;
+  background: transparent;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reject:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #7f8c8d;
+}
+
+.empty-state p:first-child {
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+
+.empty-hint {
+  font-size: 0.85em;
+  color: #95a5a6;
+}
+
+/* === DARK MODE for tabs & friends === */
+body.dark-mode .messaging-tabs {
+  background: var(--bg-paper);
+  border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .msg-tab {
+  color: var(--text-secondary);
+}
+
+body.dark-mode .msg-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+body.dark-mode .msg-tab.active {
+  color: var(--accent-primary);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+body.dark-mode .msg-tab.active::after {
+  background: var(--accent-primary);
+}
+
+body.dark-mode .friend-item,
+body.dark-mode .pending-item {
+  border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .friend-item:hover,
+body.dark-mode .pending-item:hover {
+  background: var(--bg-hover);
+}
+
+body.dark-mode .friend-avatar,
+body.dark-mode .pending-avatar {
+  border-color: var(--accent-primary);
+}
+
+body.dark-mode .friend-username,
+body.dark-mode .pending-username {
+  color: var(--text-primary);
+}
+
+body.dark-mode .friend-since,
+body.dark-mode .pending-date,
+body.dark-mode .search-hint {
+  color: var(--text-secondary);
+}
+
+body.dark-mode .btn-friend-chat {
+  border-color: var(--accent-primary);
+}
+
+body.dark-mode .btn-friend-chat:hover {
+  background: var(--accent-primary);
+}
+
+body.dark-mode .btn-friend-remove {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+body.dark-mode .empty-state {
+  color: var(--text-secondary);
+}
+
+body.dark-mode .empty-hint {
+  color: var(--text-secondary);
+}

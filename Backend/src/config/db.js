@@ -10,6 +10,7 @@ import ConversationParticipant from '../models/conversationParticipantModel.js';
 import Comment from '../models/commentModel.js';
 import Battle from '../models/battleModel.js';
 import BattleVote from '../models/battleVoteModel.js';
+import Friendship from '../models/friendshipModel.js';
 
 // ========== RELACIONES DE PERSONAJES ==========
 User.hasMany(Character, { foreignKey: 'creatorId', as: 'characters', onDelete: 'CASCADE' });
@@ -52,15 +53,34 @@ Message.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
 Conversation.belongsTo(Message, { foreignKey: 'lastMessageId', as: 'lastMessage' });
 Conversation.belongsTo(Character, { foreignKey: 'characterId', as: 'character' });
 
+// ========== RELACIONES DE AMISTAD ==========
+User.hasMany(Friendship, { foreignKey: 'requesterId', as: 'sentFriendRequests' });
+Friendship.belongsTo(User, { foreignKey: 'requesterId', as: 'requester' });
+
+User.hasMany(Friendship, { foreignKey: 'receiverId', as: 'receivedFriendRequests' });
+Friendship.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
+
 // ========== FUNCIÓN DE CONEXIÓN ==========
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ SQLite Connection established successfully.');
     
-    // CAMBIO IMPORTANTE: Pon esto en false para detener la sincronización forzada
     await sequelize.sync({ force: false, alter: false }); 
-    
+
+    // Agregar columnas nuevas si no existen (SQLite no soporta ALTER bien con alter:true)
+    const qi = sequelize.getQueryInterface();
+    const battleCols = await qi.describeTable('Battles').catch(() => ({}));
+    if (!battleCols.battleNarrative) {
+      await qi.addColumn('Battles', 'battleNarrative', { type: sequelize.Sequelize.TEXT, allowNull: true }).catch(() => {});
+    }
+    if (!battleCols.scoreChar1) {
+      await qi.addColumn('Battles', 'scoreChar1', { type: sequelize.Sequelize.INTEGER, defaultValue: 0 }).catch(() => {});
+    }
+    if (!battleCols.scoreChar2) {
+      await qi.addColumn('Battles', 'scoreChar2', { type: sequelize.Sequelize.INTEGER, defaultValue: 0 }).catch(() => {});
+    }
+
     console.log('✅ All models synchronized successfully.');
     console.log('🎮 VS Wiki Battle ETEC - Database ready!');
 
@@ -69,4 +89,4 @@ export const connectDB = async () => {
     process.exit(1);
   }
 };
-export { sequelize, User, Character, Conversation, Message, ConversationParticipant, Comment, Battle, BattleVote };
+export { sequelize, User, Character, Conversation, Message, ConversationParticipant, Comment, Battle, BattleVote, Friendship };

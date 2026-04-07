@@ -338,6 +338,55 @@
   transform: translateY(-1px);
 }
 
+/* === DARK MODE OVERRIDES === */
+body.dark-mode .character-form {
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-card);
+}
+body.dark-mode .form-section {
+  border-bottom-color: var(--border-color);
+}
+body.dark-mode .section-title {
+  color: var(--text-primary);
+}
+body.dark-mode .form-group label {
+  color: var(--text-primary);
+}
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+body.dark-mode .char-count { color: var(--text-secondary); }
+body.dark-mode .stat-control label { color: var(--text-primary); }
+body.dark-mode .stat-slider { background: var(--bg-input); }
+body.dark-mode .stat-number {
+  border-color: var(--accent-primary);
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+body.dark-mode .abilities-input input {
+  background: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+body.dark-mode .abilities-input input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+body.dark-mode .abilities-list {
+  background: var(--bg-input);
+}
+body.dark-mode .abilities-info { color: var(--text-secondary); }
+
 /* Responsive */
 @media (max-width: 768px) {
   .create-character-container {

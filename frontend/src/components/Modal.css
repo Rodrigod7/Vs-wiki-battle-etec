@@ -61,3 +61,15 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* === DARK MODE OVERRIDES === */
+body.dark-mode .modal-content {
+  background: var(--bg-paper);
+  color: var(--text-primary);
+}
+body.dark-mode .modal-content::-webkit-scrollbar-track { background: var(--bg-input); }
+body.dark-mode .modal-content::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-color: var(--bg-input);
+}
+body.dark-mode .modal-content::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }

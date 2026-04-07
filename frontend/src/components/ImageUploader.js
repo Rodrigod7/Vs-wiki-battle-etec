@@ -1,6 +1,7 @@
 // Frontend/src/components/ImageUploader.js
 import React, { useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
+import AvatarCropper from './AvatarCropper';
 import './ImageUploader.css';
 
 const ImageUploader = ({ 
@@ -11,7 +12,10 @@ const ImageUploader = ({
 }) => {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(currentImage || null);
+  const [cropSrc, setCropSrc] = useState(null); // Image data URL for cropper
   const fileInputRef = useRef(null);
+
+  const isAvatar = type === 'users';
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
@@ -27,11 +31,33 @@ const ImageUploader = ({
       return;
     }
 
+    if (isAvatar) {
+      // For avatars: open cropper first
+      const reader = new FileReader();
+      reader.onloadend = () => setCropSrc(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      // For other images: upload directly
+      const reader = new FileReader();
+      reader.onloadend = () => setPreview(reader.result);
+      reader.readAsDataURL(file);
+      await uploadImage(file);
+    }
+  };
+
+  const handleCropDone = async (croppedBlob) => {
+    setCropSrc(null);
+    const croppedFile = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+    // Show preview of cropped image
     const reader = new FileReader();
     reader.onloadend = () => setPreview(reader.result);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(croppedBlob);
+    await uploadImage(croppedFile);
+  };
 
-    await uploadImage(file);
+  const handleCropCancel = () => {
+    setCropSrc(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const uploadImage = async (file) => {
@@ -87,12 +113,12 @@ const ImageUploader = ({
       <div className="image-uploader-container">
         <div className="image-preview-wrapper">
           {preview ? (
-            <div className="image-preview-container">
+            <div className={`image-preview-container ${isAvatar ? 'avatar-preview' : ''}`}>
               <img src={preview} alt="Preview" className="image-preview" />
               <button type="button" onClick={handleRemoveImage} className="remove-image-btn" disabled={uploading}>✕</button>
             </div>
           ) : (
-            <div className="image-placeholder">
+            <div className={`image-placeholder ${isAvatar ? 'avatar-placeholder' : ''}`}>
               <p>Sin imagen</p>
             </div>
           )}
@@ -102,6 +128,15 @@ const ImageUploader = ({
           {uploading ? 'Subiendo...' : '📁 Elegir Imagen'}
         </button>
       </div>
+
+      {/* Cropper modal for avatars */}
+      {cropSrc && (
+        <AvatarCropper
+          imageSrc={cropSrc}
+          onCropDone={handleCropDone}
+          onCancel={handleCropCancel}
+        />
+      )}
     </div>
   );
 };

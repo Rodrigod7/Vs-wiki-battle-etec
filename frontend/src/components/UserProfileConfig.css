@@ -73,6 +73,28 @@
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); /* CAMBIO: Sombra azul */
 }
 
+/* === DARK MODE OVERRIDES === */
+body.dark-mode .profile-config-container h2 {
+  color: var(--text-primary);
+}
+body.dark-mode .form-section-title {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-primary);
+}
+body.dark-mode .form-section-title::before {
+  background: var(--accent-primary);
+}
+body.dark-mode .user-config-form select:disabled {
+  background-color: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+body.dark-mode .user-config-form input:not(:disabled):hover,
+body.dark-mode .user-config-form textarea:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
 /* (Indicador :required se mantiene) */
 .user-config-form input:required::after { content: '*'; color: #e74c3c; margin-left: 5px; }
 

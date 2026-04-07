@@ -1,54 +1,6 @@
 // Backend/src/controllers/battleController.js
 import { Battle, BattleVote, Character, User } from '../config/db.js';
-
-// ✅ MAPA DE PODER ACTUALIZADO
-// Asignamos un valor numérico para poder comparar matemáticamente
-const tierPowerValues = {
-  'Unknown': 0,
-  'Street Level': 1,
-  'Building Level': 2, // Agregado
-  'City Level': 3,
-  'Country Level': 4,
-  'Continental': 5,
-  'Planet Level': 6,
-  'Star Level': 7,
-  'Galaxy Level': 8,
-  'Universal': 9,
-  'Multiversal': 10,
-  'Hyperversal': 11, // 🔥 NUEVO: Gana a Multi, pierde con Omni
-  'Omnipotent': 12
-};
-
-const calculateBattleOutcome = (char1, char2) => {
-  const power1 = tierPowerValues[char1.tier] || 0;
-  const power2 = tierPowerValues[char2.tier] || 0;
-
-  let prob1, prob2;
-
-  if (power1 > power2) {
-    // Diferencia de nivel clara
-    prob1 = 90;
-    prob2 = 10;
-  } else if (power2 > power1) {
-    prob1 = 10;
-    prob2 = 90;
-  } else {
-    // Mismo nivel (Empate técnico)
-    prob1 = 50;
-    prob2 = 50;
-  }
-
-  // Factor de azar (Random roll 0-100)
-  const roll = Math.random() * 100;
-  // Si la probabilidad de 1 es 90%, gana si el roll es <= 90
-  const winnerId = roll <= prob1 ? char1._id : char2._id;
-
-  return {
-    winnerId,
-    probability1: prob1,
-    probability2: prob2
-  };
-};
+import { runBattle } from '../utils/battleEngine.js';
 
 export const createBattle = async (req, res) => {
   try {
@@ -72,8 +24,8 @@ export const createBattle = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Personajes no encontrados' });
     }
 
-    // Usar el nuevo algoritmo basado en Tiers
-    const outcome = calculateBattleOutcome(char1, char2);
+    // Ejecutar motor de batalla algorítmico
+    const outcome = runBattle(char1.toJSON(), char2.toJSON());
 
     const newBattle = await Battle.create({
       character1Id,
@@ -81,7 +33,10 @@ export const createBattle = async (req, res) => {
       creatorId: userId,
       simulationWinnerId: outcome.winnerId,
       winProbabilityChar1: outcome.probability1,
-      winProbabilityChar2: outcome.probability2
+      winProbabilityChar2: outcome.probability2,
+      battleNarrative: JSON.stringify(outcome.narrative),
+      scoreChar1: outcome.scoreChar1,
+      scoreChar2: outcome.scoreChar2,
     });
 
     const battleWithData = await Battle.findByPk(newBattle._id, {

@@ -281,6 +281,46 @@
   font-size: 1.5em;
 }
 
+/* === DARK MODE OVERRIDES === */
+body.dark-mode .detail-header {
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-card);
+}
+body.dark-mode .detail-title h1 { color: var(--text-primary); }
+body.dark-mode .alias { color: var(--text-secondary); }
+body.dark-mode .universe-badge-large {
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+body.dark-mode .detail-meta {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+body.dark-mode .detail-section {
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-card);
+}
+body.dark-mode .detail-section h2 { color: var(--text-primary); }
+body.dark-mode .description-text { color: var(--text-secondary); }
+body.dark-mode .stat-bar-header { color: var(--text-primary); }
+body.dark-mode .stat-bar-track { background: var(--bg-input); }
+body.dark-mode .stat-value { color: var(--accent-primary); }
+body.dark-mode .wiki-stats-box { background: var(--bg-input); }
+body.dark-mode .wiki-item {
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-card);
+}
+body.dark-mode .char-quote {
+  color: var(--text-secondary);
+  border-left-color: var(--accent-primary);
+}
+body.dark-mode .btn-contact {
+  background: var(--accent-primary);
+}
+body.dark-mode .btn-contact:hover {
+  background: var(--accent-hover);
+}
+
 .creator-card {
   display: flex;
   align-items: center;

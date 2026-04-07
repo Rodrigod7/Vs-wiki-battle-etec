@@ -1,6 +1,7 @@
 // frontend/src/components/Comments.js
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { getDefaultAvatar } from '../utils/avatarHelper';
 import './Comments.css';
 
 const Comments = ({ characterId }) => {
@@ -226,9 +227,10 @@ const Comments = ({ characterId }) => {
             <div key={comment._id} className="comment-item">
               <div className="comment-header">
                 <img
-                  src={comment.author?.avatar || 'https://via.placeholder.com/40'}
+                  src={comment.author?.avatar || getDefaultAvatar(comment.author?.username, 40)}
                   alt={comment.author?.username}
                   className="comment-avatar"
+                  onError={(e) => { e.target.src = getDefaultAvatar(comment.author?.username, 40); }}
                 />
                 <div className="comment-meta">
                   <span className="comment-author">{comment.author?.username || 'Anónimo'}</span>
@@ -297,9 +299,10 @@ const Comments = ({ characterId }) => {
                     <div key={reply._id} className="reply-item">
                       <div className="comment-header">
                         <img
-                          src={reply.author?.avatar || 'https://via.placeholder.com/32'}
+                          src={reply.author?.avatar || getDefaultAvatar(reply.author?.username, 32)}
                           alt={reply.author?.username}
                           className="reply-avatar"
+                          onError={(e) => { e.target.src = getDefaultAvatar(reply.author?.username, 32); }}
                         />
                         <div className="comment-meta">
                           <span className="comment-author">{reply.author?.username || 'Anónimo'}</span>

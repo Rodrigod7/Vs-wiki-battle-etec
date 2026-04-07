@@ -1,5 +1,5 @@
 // frontend/src/components/VerifyEmail.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -10,11 +10,15 @@ const VerifyEmail = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [status, setStatus] = useState('verifying'); // Estados: verifying, success, error
+  const hasVerified = useRef(false); // Guard para evitar doble ejecución
 
   // ✅ CORREGIDO: Usamos ruta relativa para evitar el error de red local
   const API_URL = process.env.REACT_APP_API_URL || '/api';
 
   useEffect(() => {
+    if (hasVerified.current) return;
+    hasVerified.current = true;
+
     const verifyAccount = async () => {
       try {
         // Llamamos al backend para validar el token
@@ -94,22 +98,23 @@ const styles = {
     padding: '20px',
   },
   card: {
-    background: 'white',
+    background: 'var(--bg-paper, white)',
     padding: '40px',
     borderRadius: '20px',
-    boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+    boxShadow: 'var(--shadow-card, 0 10px 40px rgba(0,0,0,0.1))',
     textAlign: 'center',
     maxWidth: '500px',
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '15px'
+    gap: '15px',
+    color: 'var(--text-primary, #2c3e50)'
   },
   title: {
     margin: '10px 0',
     fontSize: '1.8em',
-    color: '#2c3e50'
+    color: 'var(--text-primary, #2c3e50)'
   }
 };
 

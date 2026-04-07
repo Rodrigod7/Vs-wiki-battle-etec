@@ -1,6 +1,7 @@
 // src/components/ConversationList.js
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { getDefaultAvatar } from '../utils/avatarHelper';
 import './Messaging.css'; // Usa el CSS compartido
 
 const ConversationList = ({ conversations, onSelectConversation, activeConversationId }) => {
@@ -35,9 +36,10 @@ const ConversationList = ({ conversations, onSelectConversation, activeConversat
             onClick={() => onSelectConversation(conv._id)}
           >
             <img
-              src={otherParticipant.avatar || 'https://via.placeholder.com/50'}
+              src={otherParticipant.avatar || getDefaultAvatar(otherParticipant.username, 50)}
               alt={otherParticipant.username}
               className="conversation-avatar"
+              onError={(e) => { e.target.src = getDefaultAvatar(otherParticipant.username, 50); }}
             />
             <div className="conversation-info">
               <h5>{otherParticipant.username}</h5>

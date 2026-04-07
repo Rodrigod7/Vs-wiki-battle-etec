@@ -1,13 +1,14 @@
 // src/components/NotificationBell.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSocket } from '../context/SocketContext';
 import './NotificationBell.css';
 
 const NotificationBell = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+  const { on, off } = useSocket();
 
-  // ✅ Usamos useCallback para poder reusar la función
   const fetchUnreadCount = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -29,20 +30,29 @@ const NotificationBell = () => {
 
   useEffect(() => {
     fetchUnreadCount();
-    
-    const interval = setInterval(fetchUnreadCount, 10000);
 
-    // ✅ Escuchar evento de mensajes leídos (desde ChatWindow)
+    // Real-time: refresh count when a new message arrives globally
+    const handleNotification = () => {
+      fetchUnreadCount();
+    };
+
+    on('notification-new-message', handleNotification);
+
+    // Also listen for the window event dispatched by ChatWindow on read
     const handleMessagesRead = () => {
-        fetchUnreadCount();
+      fetchUnreadCount();
     };
     window.addEventListener('messagesRead', handleMessagesRead);
 
+    // Fallback polling every 30s (much less frequent now)
+    const interval = setInterval(fetchUnreadCount, 30000);
+
     return () => {
-        clearInterval(interval);
-        window.removeEventListener('messagesRead', handleMessagesRead);
+      off('notification-new-message', handleNotification);
+      window.removeEventListener('messagesRead', handleMessagesRead);
+      clearInterval(interval);
     };
-  }, [fetchUnreadCount]);
+  }, [fetchUnreadCount, on, off]);
 
   return (
     <div 

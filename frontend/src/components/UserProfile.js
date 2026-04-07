@@ -2,17 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import { getDefaultAvatar } from '../utils/avatarHelper';
 import './UserProfile.css';
 
 const UserProfile = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const { user: currentUser, isLoggedIn } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [friendStatus, setFriendStatus] = useState(null); // { status, friendshipId, direction }
+  const [friendLoading, setFriendLoading] = useState(false);
 
   useEffect(() => {
     fetchUserProfile();
-  }, [userId]);
+    if (isLoggedIn) fetchFriendStatus();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, isLoggedIn]);
 
   const fetchUserProfile = async () => {
     try {
@@ -32,6 +39,151 @@ const UserProfile = () => {
     }
   };
 
+  const fetchFriendStatus = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch(`/api/friends/status/${userId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFriendStatus(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching friendship status:', error);
+    }
+  };
+
+  const handleSendFriendRequest = async () => {
+    const token = localStorage.getItem('token');
+    setFriendLoading(true);
+    try {
+      const res = await fetch('/api/friends/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ receiverId: parseInt(userId) })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success(data.message);
+        fetchFriendStatus();
+      } else {
+        toast.error(data.message || 'Error al enviar solicitud');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setFriendLoading(false);
+    }
+  };
+
+  const handleRespondRequest = async (action) => {
+    const token = localStorage.getItem('token');
+    setFriendLoading(true);
+    try {
+      const res = await fetch(`/api/friends/${friendStatus.friendshipId}/respond`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success(data.message);
+        fetchFriendStatus();
+      } else {
+        toast.error(data.message || 'Error');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setFriendLoading(false);
+    }
+  };
+
+  const handleRemoveFriend = async () => {
+    const token = localStorage.getItem('token');
+    setFriendLoading(true);
+    try {
+      const res = await fetch(`/api/friends/${friendStatus.friendshipId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Amigo eliminado');
+        fetchFriendStatus();
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setFriendLoading(false);
+    }
+  };
+
+  const handleStartChat = () => {
+    navigate('/messages');
+    sessionStorage.setItem('startChatWithUser', userId);
+  };
+
+  const renderFriendButton = () => {
+    if (!isLoggedIn || !friendStatus || friendStatus.status === 'self') return null;
+
+    if (friendStatus.status === 'none') {
+      return (
+        <button className="btn-friend-action btn-add-friend" onClick={handleSendFriendRequest} disabled={friendLoading}>
+          {friendLoading ? '...' : '➕ Agregar amigo'}
+        </button>
+      );
+    }
+
+    if (friendStatus.status === 'pending') {
+      if (friendStatus.direction === 'sent') {
+        return <button className="btn-friend-action btn-pending" disabled>⏳ Solicitud enviada</button>;
+      }
+      // Received — show accept/reject
+      return (
+        <div className="friend-request-actions">
+          <button className="btn-friend-action btn-accept-profile" onClick={() => handleRespondRequest('accept')} disabled={friendLoading}>
+            ✓ Aceptar solicitud
+          </button>
+          <button className="btn-friend-action btn-reject-profile" onClick={() => handleRespondRequest('reject')} disabled={friendLoading}>
+            ✕ Rechazar
+          </button>
+        </div>
+      );
+    }
+
+    if (friendStatus.status === 'accepted') {
+      return (
+        <div className="friend-request-actions">
+          <button className="btn-friend-action btn-chat-friend" onClick={handleStartChat}>
+            💬 Enviar mensaje
+          </button>
+          <button className="btn-friend-action btn-remove-friend" onClick={handleRemoveFriend} disabled={friendLoading}>
+            ✕ Eliminar amigo
+          </button>
+        </div>
+      );
+    }
+
+    if (friendStatus.status === 'rejected') {
+      return (
+        <button className="btn-friend-action btn-add-friend" onClick={handleSendFriendRequest} disabled={friendLoading}>
+          {friendLoading ? '...' : '➕ Agregar amigo'}
+        </button>
+      );
+    }
+
+    return null;
+  };
+
   if (loading) {
     return <div className="loading-screen">Cargando perfil...</div>;
   }
@@ -47,9 +199,10 @@ const UserProfile = () => {
       <div className="profile-header">
         <div className="profile-avatar-container">
           <img
-            src={user.avatar || 'https://via.placeholder.com/150'}
+            src={user.avatar || getDefaultAvatar(user.username, 150)}
             alt={user.username}
             className="profile-avatar"
+            onError={(e) => { e.target.src = getDefaultAvatar(user.username, 150); }}
           />
         </div>
         <div className="profile-info">
@@ -58,6 +211,7 @@ const UserProfile = () => {
           <p className="profile-joined">
             📅 Miembro desde {new Date(user.createdAt).toLocaleDateString('es-ES')}
           </p>
+          {renderFriendButton()}
         </div>
       </div>
 

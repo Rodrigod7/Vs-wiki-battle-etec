@@ -68,6 +68,19 @@ const Battle = sequelize.define('Battle', {
   views: {
     type: DataTypes.INTEGER,
     defaultValue: 0
+  },
+  // Narrativa de batalla generada por el motor algorítmico
+  battleNarrative: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  scoreChar1: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  scoreChar2: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   }
 }, {
   timestamps: true
@@ -77,6 +90,7 @@ Battle.prototype.toJSON = function () {
   const values = { ...this.get() };
   values._id = values._id || values.id;
   delete values.id;
+  try { values.battleNarrative = JSON.parse(values.battleNarrative || '[]'); } catch { values.battleNarrative = []; }
   return values;
 };
 

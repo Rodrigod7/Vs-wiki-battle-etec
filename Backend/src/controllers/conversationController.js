@@ -1,5 +1,5 @@
 // Backend/src/controllers/conversationController.js
-import { Conversation, Message, User, Character } from '../config/db.js';
+import { Conversation, Message, User, Character, Friendship } from '../config/db.js';
 import { Op } from 'sequelize';
 
 // Helper para obtener las opciones de inclusión de forma segura
@@ -76,6 +76,21 @@ export const createConversation = async (req, res) => {
 
     if (parseInt(participantId) === userId) {
       return res.status(400).json({ success: false, message: 'No puedes hablar contigo mismo' });
+    }
+
+    // Verificar que son amigos antes de crear conversación
+    const friendship = await Friendship.findOne({
+      where: {
+        status: 'accepted',
+        [Op.or]: [
+          { requesterId: userId, receiverId: parseInt(participantId) },
+          { requesterId: parseInt(participantId), receiverId: userId }
+        ]
+      }
+    });
+
+    if (!friendship) {
+      return res.status(403).json({ success: false, message: 'Solo puedes chatear con amigos. Envía una solicitud de amistad primero.' });
     }
     
     // 1. Buscar si ya existe el chat

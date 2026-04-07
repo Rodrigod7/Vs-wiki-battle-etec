@@ -25,11 +25,15 @@ body.light-mode {
   --accent-hover: #2980b9;
   --accent-glow: rgba(52, 152, 219, 0.3);
 
+  /* Header */
+  --header-bg: linear-gradient(135deg, #2c3e50, #3498db);
+  --header-text: #ffffff;
+
   /* ✅ VARIABLES ESPECÍFICAS DEL SIDEBAR (LIGHT) */
-  --sidebar-bg: #ffffff;           /* Fondo blanco limpio */
-  --sidebar-text: #2c3e50;         /* Texto oscuro */
-  --sidebar-btn-bg: #f8f9fa;       /* Botones gris muy suave */
-  --sidebar-btn-hover: #e2e8f0;    /* Hover un poco más oscuro */
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #2c3e50;
+  --sidebar-btn-bg: #f8f9fa;
+  --sidebar-btn-hover: #e2e8f0;
   --sidebar-border: #e1e8ed;
 }
 
@@ -54,10 +58,14 @@ body.dark-mode {
   --accent-hover: #0ea5e9;
   --accent-glow: rgba(56, 189, 248, 0.4);
 
+  /* Header */
+  --header-bg: linear-gradient(135deg, #1e293b, #0f172a);
+  --header-text: #f1f5f9;
+
   /* ✅ VARIABLES ESPECÍFICAS DEL SIDEBAR (DARK) */
-  --sidebar-bg: #1e293b;           /* Azul oscuro profundo */
-  --sidebar-text: #f1f5f9;         /* Texto claro */
-  --sidebar-btn-bg: rgba(255, 255, 255, 0.05); /* Transparencia sutil */
+  --sidebar-bg: #1e293b;
+  --sidebar-text: #f1f5f9;
+  --sidebar-btn-bg: rgba(255, 255, 255, 0.05);
   --sidebar-btn-hover: rgba(255, 255, 255, 0.1);
   --sidebar-border: rgba(255, 255, 255, 0.1);
 }
@@ -71,3 +79,4 @@ body {
 
 h1, h2, h3, h4, h5, h6 { color: var(--text-primary); }
 a { color: var(--accent-primary); }
+a.btn { color: white; }

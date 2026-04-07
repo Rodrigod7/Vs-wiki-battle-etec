@@ -140,3 +140,32 @@
     flex: 1;
   }
 }
+
+/* === DARK MODE OVERRIDES === */
+body.dark-mode .manage-characters-container {
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-card);
+}
+body.dark-mode .manage-characters-container h2 {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-primary);
+}
+body.dark-mode .character-management-card {
+  background: var(--bg-paper);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-card);
+}
+body.dark-mode .character-management-card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-hover);
+}
+body.dark-mode .character-details h4 { color: var(--text-primary); }
+body.dark-mode .char-alias { color: var(--text-secondary); }
+body.dark-mode .character-details p { color: var(--text-secondary); }
+body.dark-mode .loading-message {
+  color: var(--text-secondary);
+  background: var(--bg-paper);
+}
+body.dark-mode .error-message {
+  background: rgba(231, 76, 60, 0.1);
+}

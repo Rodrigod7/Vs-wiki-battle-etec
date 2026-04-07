@@ -40,9 +40,15 @@
 .spinner-message {
   color: #7f8c8d;
   font-size: 0.95em;
-  margin: 0;
-  animation: fadeIn 0.5s ease;
 }
+
+/* === DARK MODE OVERRIDES === */
+body.dark-mode .spinner-small,
+body.dark-mode .spinner-medium,
+body.dark-mode .spinner-large {
+  border-color: var(--accent-primary) transparent var(--accent-primary) transparent;
+}
+body.dark-mode .spinner-message { color: var(--text-secondary); }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }

@@ -1,16 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getDefaultAvatar } from '../utils/avatarHelper';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
     const { isLoggedIn, logout, user } = useAuth();
    
-    // ✅ CORREGIDO: Cambiado a placehold.co que es más estable
     const avatar = user && user.avatar
         ? user.avatar
-        : 'https://placehold.co/60x60/3498db/FFFFFF?text=P';
+        : getDefaultAvatar(user?.username || 'U', 60);
            
     const username = user ? user.username : 'Guerrero';
 
@@ -38,7 +38,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                                     alt="Perfil"
                                     className="profile-photo"
                                     onError={(e) => {
-                                        e.target.src = 'https://placehold.co/60x60/3498db/FFFFFF?text=P';
+                                        e.target.src = getDefaultAvatar(user?.username || 'U', 60);
                                     }}
                                 />
                                 <span className="profile-name">{username}</span>
